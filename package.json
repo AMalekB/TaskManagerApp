@@ -1,5 +1,5 @@
 {
- "name": "gabarit",
+ "name": "TaskManagementApp",
  "version": "1.0.0",
  "description": "Gabarit Serveur avec Node.js et express",
  "main": "server.js",
