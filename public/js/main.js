@@ -22,3 +22,23 @@ function closeModal(modalId) {
     const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
     if (modal) modal.hide();
 }
+// Ajouter une tâche
+document.getElementById("addTaskButton").addEventListener("click", addTask);
+
+function addTask() {
+    const title = document.getElementById("taskTitle").value;
+    const description = document.getElementById("taskDescription").value;
+    const priority = document.getElementById("taskPriority").value;
+    const dueDate = document.getElementById("taskDueDate").value;
+
+    const task = createTaskElement(title, description, priority, dueDate);
+    document.getElementById("todo").appendChild(task);
+
+    closeModal("addTaskModal");
+    document.getElementById("addTaskForm").reset();
+}
+
+// Supprimer une tâche
+function deleteTask(task) {
+    task.remove();
+}
