@@ -1,5 +1,4 @@
-h1 {
- color: blue;
- font-size: large;
- font-weight: 800;
+body{
+    background: linear-gradient(to right, #696993, #342b82);
+    height: 100vh;
 }
