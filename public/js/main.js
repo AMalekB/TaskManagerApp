@@ -42,3 +42,14 @@ function addTask() {
 function deleteTask(task) {
     task.remove();
 }
+
+// Sauvegarder les modifications d'une tâche
+function saveEditedTask() {
+    currentTask.querySelector("h6").innerText = document.getElementById("editTaskTitle").value;
+    currentTask.querySelector("p").innerText = document.getElementById("editTaskDescription").value;
+    currentTask.querySelector(".task-priority").innerText = "Priorité: " + document.getElementById("editTaskPriority").value;
+    currentTask.querySelector(".task-due-date").innerText = "Date limite: " + document.getElementById("editTaskDueDate").value;
+
+    closeModal("editTaskModal");
+}
+document.getElementById("saveEditButton").addEventListener("click", saveEditedTask);
