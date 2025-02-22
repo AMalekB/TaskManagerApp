@@ -78,5 +78,43 @@
         </div>
     </div>
 </div>
+
+    <!-- Modale pour modifier une tâche -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier la tâche</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTaskForm">
+                        <div class="mb-3">
+                            <label for="editTaskTitle" class="form-label">Titre:</label>
+                            <input type="text" class="form-control" id="editTaskTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTaskDescription" class="form-label">Description:</label>
+                            <textarea class="form-control" id="editTaskDescription" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTaskPriority" class="form-label">Priorité:</label>
+                            <select class="form-select" id="editTaskPriority">
+                                <option value="Faible">Faible</option>
+                                <option value="Moyenne">Moyenne</option>
+                                <option value="Élevée">Élevée</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTaskDueDate" class="form-label">Date limite:</label>
+                            <input type="date" class="form-control" id="editTaskDueDate" required>
+                        </div>
+                        <button id="saveEditButton" class="btn btn-primary">Sauvegarder</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
  </body>
 </html>
