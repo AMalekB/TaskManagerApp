@@ -53,3 +53,35 @@ function saveEditedTask() {
     closeModal("editTaskModal");
 }
 document.getElementById("saveEditButton").addEventListener("click", saveEditedTask);
+
+// Créer un élément de tâche avec boutons Modifier et Supprimer
+function createTaskElement(title, description, priority, dueDate) {
+    const template = document.getElementById("taskTemplate");
+    const task = template.content.cloneNode(true);
+    const taskContainer = document.createElement("div");
+
+    task.querySelector("h6").textContent = title;
+    task.querySelector("p").textContent = description;
+    task.querySelector(".task-priority").textContent = "Priorité: " + priority;
+    task.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
+
+    // Ajout de l'événement pour le changement de statut
+    const taskStatusSelect = task.getElementById("taskStatus");  
+    taskStatusSelect.addEventListener("change", function(event) {
+        changeStatus(event, taskContainer);
+    });
+
+    // Ajouter les événements pour les boutons
+    const editButton = task.querySelector(".btn-warning");
+    editButton.addEventListener("click", function () {
+        openEditTaskModal(taskContainer);
+    });
+
+    const deleteButton = task.querySelector(".btn-danger");
+    deleteButton.addEventListener("click", function () {
+        deleteTask(taskContainer);
+    });
+
+    taskContainer.appendChild(task);
+    return taskContainer;
+}
