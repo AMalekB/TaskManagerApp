@@ -1,3 +1,5 @@
+let currentTask;
+
 // Ouvrir la modale d'ajout de tâche
 function openAddTaskModal() {
     const modal = new bootstrap.Modal(document.getElementById("addTaskModal"));
