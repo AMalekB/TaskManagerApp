@@ -85,3 +85,27 @@ function createTaskElement(title, description, priority, dueDate) {
     taskContainer.appendChild(task);
     return taskContainer;
 }
+
+// Changer le statut de la tâche
+function changeStatus(event, taskContainer) {
+    const taskStatus = event.target.value;
+    const taskDiv = taskContainer;
+
+    switch(taskStatus) {
+        case "todo":
+            document.getElementById("todo").appendChild(taskDiv);
+            break;
+        case "in-progress":
+            document.getElementById("in-progress").appendChild(taskDiv);
+            break;
+        case "in-review":
+            document.getElementById("in-review").appendChild(taskDiv);
+            break;
+        case "done":
+            document.getElementById("done").appendChild(taskDiv);
+            break;
+        default:
+            document.getElementById("todo").appendChild(taskDiv);
+    }
+}
+document.getElementById("taskStatus").addEventListener("change", changeStatus);
