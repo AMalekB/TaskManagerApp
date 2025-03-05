@@ -19,12 +19,26 @@ export const AddTask = (task)=>{
 }
 
 //Fonction pour modifier le statut d'une tâche
-export const UpdateTask = (id,newStatus) => {
+export const UpdateTaskStatus = (id,newStatus) => {
     const task = tasks.find((task) => task.id === id);
     if (task) {
         task.statut = newStatus;
         return task;
     }
     return null;
-};
+}; 
+// Modifier la tache
+ export const UpdateTask = (id, updatedTask) => {
+    const task = tasks.find((task) => task.id === id);
+    if (task) {
+        task.titre = updatedTask.titre
+        task.description = updatedTask.description
+        task.priorité = updatedTask.priorité
+        task.statut = updatedTask.statut
+        task.dateLimite = updatedTask.dateLimite
+        // historique: []
+        return task;
+    }
+    return null;
+ }
 
