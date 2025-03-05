@@ -42,3 +42,13 @@ export const UpdateTaskStatus = (id,newStatus) => {
     return null;
  }
 
+ //Fonction pour supprimer une tache
+ const deleteTask = (id) => {
+    const task = task.find ((task) => task.id ===id);
+    if(task){
+        tasks.splice (tasks.indexOf(task),1)
+    }
+    return null;
+
+ }
+
