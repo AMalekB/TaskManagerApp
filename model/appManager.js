@@ -17,3 +17,14 @@ export const AddTask = (task)=>{
     };
     tasks.push(newTask);
 }
+
+//Fonction pour modifier le statut d'une tâche
+export const UpdateTask = (id,newStatus) => {
+    const task = tasks.find((task) => task.id === id);
+    if (task) {
+        task.statut = newStatus;
+        return task;
+    }
+    return null;
+};
+
