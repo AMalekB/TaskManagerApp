@@ -31,6 +31,21 @@ router.patch("/api/task/:id/statut", (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
+// Modifier une tâche complète
+router.put("/api/task/:id", (request, response) => {
+    try {
+        const id = parseInt(request.params.id, 10);
+        const { titre, description, priorité, statut, dateLimite } = request.body;
+        const updatedTask = UpdateTask(id, { titre, description, priorité, statut, dateLimite });
 
+        if (updatedTask) {
+            response.status(200).json({ updatedTask, message: "Tâche mise à jour avec succès" });
+        } else {
+            response.status(404).json({ message: "Tâche non trouvée" });
+        }
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
+});     
 
 export default router;
