@@ -16,7 +16,7 @@ router.post("/api/task", (request, response) => {
     }
 });
 // Récupérer toutes les tâches
-router.get("/api/taks", (request, response) => {
+router.get("/api/task", (request, response) => {
     try {
         const ListeTaches = getAllTasks();
         response.status(200).json({ ListeTaches, message: "Voici la liste des tâches" });
