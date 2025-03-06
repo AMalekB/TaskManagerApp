@@ -46,6 +46,22 @@ router.put("/api/task/:id", (request, response) => {
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
-});     
+});   
+// Supprimer une tâche
+router.delete("/api/task/:id", (request, response) => {
+    try {
+        const id = parseInt(request.params.id, 10);
+        const deletedTask = deleteTask(id);
+
+        if (deletedTask) {
+            response.status(200).json({ message: "Tâche supprimée avec succès", deletedTask });
+        } else {
+            response.status(404).json({ message: "Tâche non trouvée" });
+        }
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
+}); 
+
 
 export default router;
