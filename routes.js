@@ -4,7 +4,7 @@ import { getAllTasks, AddTask, UpdateTaskStatus, UpdateTask, deleteTask } from "
 const router = Router();
 
 // Ajouter une tâche
-router.post("/api/todo", (request, response) => {
+router.post("/api/task", (request, response) => {
     const tacheEntrée = request.body;
     try {
         const NouvelleTache = AddTask(tacheEntrée);
