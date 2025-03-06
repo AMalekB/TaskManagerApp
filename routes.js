@@ -15,6 +15,16 @@ router.post("/api/todo", (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
+// Récupérer toutes les tâches
+router.get("/api/taks", (request, response) => {
+    try {
+        const ListeTaches = getAllTasks();
+        response.status(200).json({ ListeTaches, message: "Voici la liste des tâches" });
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
+});
+
 // Modifier le statut d'une tâche
 router.patch("/api/task/:id/statut", (request, response) => {
     try {
