@@ -5,18 +5,19 @@ const tasks  = [];
 export const getAllTasks = ()=> tasks;
  
 // Fonction pour ajouter une tâche
-export const AddTask = (task)=>{
+export const AddTask = (task) => {
     const newTask = {
         id: tasks.length + 1,
-        titre,
-        description,
-        priorité,
+        titre: task.titre,  
+        description: task.description,
+        priorité: task.priorité,
         statut: "À faire",
-        dateLimite,
+        dateLimite: task.dateLimite,
         historique: []
     };
     tasks.push(newTask);
-}
+    return newTask;
+};
 
 //Fonction pour modifier le statut d'une tâche
 export const UpdateTaskStatus = (id,newStatus) => {
