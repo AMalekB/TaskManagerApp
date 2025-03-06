@@ -53,12 +53,11 @@ export const UpdateTask = (id, updatedTask) => {
 
 
  //Fonction pour supprimer une tache
- const deleteTask = (id) => {
-    const task = task.find ((task) => task.id ===id);
-    if(task){
-        tasks.splice (tasks.indexOf(task),1)
+ export const deleteTask = (id) => {
+    const index = tasks.findIndex((task) => task.id === Number(id)); // Convertie en nombre
+    if (index !== -1) {
+        return tasks.splice(index, 1)[0]; // Supprime et retourne la tâche supprimée
     }
     return null;
-
- }
+};
 
