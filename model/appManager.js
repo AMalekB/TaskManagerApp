@@ -30,19 +30,27 @@ export const UpdateTaskStatus = (id, newStatus) => {
 };
 
 // Modifier la tache
- export const UpdateTask = (id, updatedTask) => {
-    const task = tasks.find((task) => task.id === id);
+export const UpdateTask = (id, updatedTask) => {
+    const task = tasks.find((task) => task.id === Number(id));
     if (task) {
-        task.titre = updatedTask.titre
-        task.description = updatedTask.description
-        task.priorité = updatedTask.priorité
-        task.statut = updatedTask.statut
-        task.dateLimite = updatedTask.dateLimite
-        // historique: []
+        task.titre = updatedTask.titre;
+        task.description = updatedTask.description;
+        task.priorité = updatedTask.priorité;
+        task.statut = updatedTask.statut;
+        task.dateLimite = updatedTask.dateLimite;
+
+        // Ajouter à l'historique des modifications
+        task.historique.push({
+            date: new Date(),
+            action: "Mise à jour",
+            utilisateur: "Admin"
+        });
+
         return task;
     }
     return null;
- }
+};
+
 
  //Fonction pour supprimer une tache
  const deleteTask = (id) => {
