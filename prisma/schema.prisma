@@ -26,7 +26,7 @@ model Task {
   statut        Statut       @relation(fields: [statutId], references: [id])
   utilisateurId Int
   utilisateur   Utilisateur  @relation(fields: [utilisateurId], references: [id])
-  dateLimite    BigInt // ✅ Stocker la date en millisecondes (EPOCH)
+  dateLimite    DateTime
   historiques   Historique[] // 👈 Une tâche peut avoir plusieurs historiques
 }
 
@@ -53,7 +53,7 @@ model Utilisateur {
 model Historique {
   id            Int         @id @default(autoincrement())
   taskId        Int
-  task          Task        @relation(fields: [taskId], references: [id]) // 👈 Lien vers la tâche
+  task          Task        @relation(fields: [taskId], references: [id], onDelete: Cascade) // Lien vers la tâche
   utilisateurId Int
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
   action        ActionType

@@ -1,4 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ActionType } from "@prisma/client";
+
+// Créer une instance du client prisma
+const prisma = new PrismaClient();
 
 // Création d'une liste de tâches vide
 //const tasks  = [];
@@ -18,7 +21,7 @@ export const addTask = async (task) => {
             prioriteId: task.prioriteId,
             statutId: task.statutId,
             utilisateurId: task.utilisateurId,
-            dateLimite: task.dateLimite,
+            dateLimite: new Date(task.dateLimite), //Convertir la dateLimite en un objet Date
         },
     });
         
@@ -28,7 +31,7 @@ export const addTask = async (task) => {
             taskId: newTask.id,
             utilisateurId: task.utilisateurId,
             action: ActionType.CREATION,  // Utilisation de l'enum ActionType
-            dateAction: Date.now(),  // Utilisation de Date.now() pour obtenir un timestamp EPOCH
+            dateAction: new Date(),  
         },
      });
 
@@ -59,7 +62,7 @@ export const updateTaskStatus = async (id, newStatusId, utilisateurId) => {
                 taskId: updatedTask.id,
                 utilisateurId: utilisateurId, // ID de l'utilisateur ayant effectué la mise à jour
                 action: ActionType.MODIFICATION, // Utilisation de l'enum ActionType
-                dateAction: Date.now(),  // Utilisation du timestamp EPOCH
+                dateAction: new Date(),  
             },
         });
 
@@ -98,7 +101,7 @@ export const updateTask = async (id, updatedTaskData, utilisateurId) => {
             taskId: taskToUpdate .id,
             utilisateurId: utilisateurId,  // ID de l'utilisateur ayant effectué la mise à jour
             action: ActionType.MODIFICATION, // Utilisation de l'enum ActionType
-            dateAction: Date.now(),  // Utilisation du timestamp EPOCH
+            dateAction: new Date(),  // Utilisation du timestamp EPOCH
         },
     });
 
@@ -129,7 +132,7 @@ export const updateTask = async (id, updatedTaskData, utilisateurId) => {
                 taskId: Number(id),
                 utilisateurId: utilisateurId, // ID de l'utilisateur ayant effectué la suppression
                 action: ActionType.SUPPRESSION, // Utilisation de l'enum ActionType
-                dateAction: Date.now(), // Utilisation du timestamp EPOCH
+                dateAction: new Date(), // Utilisation du timestamp EPOCH
             },
         });
 

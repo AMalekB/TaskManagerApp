@@ -4,10 +4,10 @@ import { getAllTasks, addTask, updateTaskStatus, updateTask, deleteTask } from "
 const router = Router();
 
 // Ajouter une tâche
-router.post("/api/task", (request, response) => {
+router.post("/api/task", async (request, response) => {
     const tacheEntrée = request.body;
     try {
-        const NouvelleTache = addTask(tacheEntrée);
+        const NouvelleTache = await addTask(tacheEntrée);
         response
             .status(200)
             .json({ NouvelleTache, message: "Tâche ajoutée avec succès" });
@@ -17,9 +17,9 @@ router.post("/api/task", (request, response) => {
 });
 
 // Récupérer toutes les tâches
-router.get("/api/task", (request, response) => {
+router.get("/api/tasks", async (request, response) => {
     try {
-        const ListeTaches = getAllTasks();
+        const ListeTaches = await getAllTasks();
         response.status(200).json({ ListeTaches, message: "Voici la liste des tâches" });
     } catch (error) {
         response.status(400).json({ error: error.message });
@@ -27,11 +27,11 @@ router.get("/api/task", (request, response) => {
 });
 
 // Modifier le statut d'une tâche
-router.patch("/api/task/:id/statut", (request, response) => {
+router.patch("/api/task/:id/statut", async (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
-        const { statut } = request.body;
-        const updatedTask = updateTaskStatus(id, statut);
+        const { statut, utilisateurId } = request.body;
+        const updatedTask = await updateTaskStatus(id, statut, utilisateurId);
 
         if (updatedTask) {
             response.status(200).json({ updatedTask, message: "Statut mis à jour avec succès" });
@@ -44,11 +44,11 @@ router.patch("/api/task/:id/statut", (request, response) => {
 });
 
 // Modifier une tâche complète
-router.put("/api/task/:id", (request, response) => {
+router.put("/api/task/:id", async (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
-        const { titre, description, priorité, statut, dateLimite } = request.body;
-        const updatedTask = updateTask(id, { titre, description, priorité, statut, dateLimite });
+        const { titre, description, priorité, statut, dateLimite, utilisateurId } = request.body;
+        const updatedTask = await updateTask(id, { titre, description, priorité, statut, dateLimite}, utilisateurId );
 
         if (updatedTask) {
             response.status(200).json({ updatedTask, message: "Tâche mise à jour avec succès" });
@@ -59,11 +59,13 @@ router.put("/api/task/:id", (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });   
+
 // Supprimer une tâche
-router.delete("/api/task/:id", (request, response) => {
+router.delete("/api/task/:id", async (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
-        const deletedTask = deleteTask(id);
+        const { utilisateurId } = request.body;  // Récupérer l'utilisateur depuis le body
+        const deletedTask = await deleteTask(id, utilisateurId);
 
         if (deletedTask) {
             response.status(200).json({ message: "Tâche supprimée avec succès", deletedTask });
