@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllTasks, AddTask, UpdateTaskStatus, UpdateTask, deleteTask } from "./model/appManager.js";
+import { getAllTasks, addTask, updateTaskStatus, updateTask, deleteTask } from "./model/appManager.js";
 
 const router = Router();
 
@@ -7,7 +7,7 @@ const router = Router();
 router.post("/api/task", (request, response) => {
     const tacheEntrée = request.body;
     try {
-        const NouvelleTache = AddTask(tacheEntrée);
+        const NouvelleTache = addTask(tacheEntrée);
         response
             .status(200)
             .json({ NouvelleTache, message: "Tâche ajoutée avec succès" });
@@ -15,6 +15,7 @@ router.post("/api/task", (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
+
 // Récupérer toutes les tâches
 router.get("/api/task", (request, response) => {
     try {
@@ -30,7 +31,7 @@ router.patch("/api/task/:id/statut", (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
         const { statut } = request.body;
-        const updatedTask = UpdateTaskStatus(id, statut);
+        const updatedTask = updateTaskStatus(id, statut);
 
         if (updatedTask) {
             response.status(200).json({ updatedTask, message: "Statut mis à jour avec succès" });
@@ -41,12 +42,13 @@ router.patch("/api/task/:id/statut", (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
+
 // Modifier une tâche complète
 router.put("/api/task/:id", (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
         const { titre, description, priorité, statut, dateLimite } = request.body;
-        const updatedTask = UpdateTask(id, { titre, description, priorité, statut, dateLimite });
+        const updatedTask = updateTask(id, { titre, description, priorité, statut, dateLimite });
 
         if (updatedTask) {
             response.status(200).json({ updatedTask, message: "Tâche mise à jour avec succès" });

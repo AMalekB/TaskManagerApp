@@ -1,63 +1,142 @@
+import { PrismaClient } from "@prisma/client";
+
 // Création d'une liste de tâches vide
-const tasks  = [];
+//const tasks  = [];
  
 // Fonction pour recuperer toutes les tâches
-export const getAllTasks = ()=> tasks;
+export const getAllTasks = async ()=> {
+    return await prisma.task.findMany();
+};
  
 // Fonction pour ajouter une tâche
-export const AddTask = (task) => {
-    const newTask = {
-        id: tasks.length + 1,
-        titre: task.titre,  
-        description: task.description,
-        priorité: task.priorité,
-        statut: "À faire",
-        dateLimite: task.dateLimite,
-        historique: []
-    };
-    tasks.push(newTask);
-    return newTask;
-};
+export const addTask = async (task) => {
+    // Création de la tâche dans la base de données
+    const newTask = await prisma.task.create({
+        data:{
+            titre: task.titre,
+            description: task.description,
+            prioriteId: task.prioriteId,
+            statutId: task.statutId,
+            utilisateurId: task.utilisateurId,
+            dateLimite: task.dateLimite,
+        },
+    });
+        
+     // Ajouter à l'historique de la tâche (création)
+     await prisma.historique.create({
+        data: {
+            taskId: newTask.id,
+            utilisateurId: task.utilisateurId,
+            action: ActionType.CREATION,  // Utilisation de l'enum ActionType
+            dateAction: Date.now(),  // Utilisation de Date.now() pour obtenir un timestamp EPOCH
+        },
+     });
 
-//Fonction pour modifier le statut d'une tâche
-export const UpdateTaskStatus = (id, newStatus) => {
-    const task = tasks.find((task) => task.id === Number(id));
+     return newTask;
+};
+    
+
+
+// Fonction pour modifier le statut d'une tâche
+export const updateTaskStatus = async (id, newStatusId, utilisateurId) => {
+    // Chercher la tâche dans la base de données
+    const task = await prisma.task.findUnique({
+        where: { id: Number(id) },
+    });
+
     if (task) {
-        task.statut = newStatus;
-        return task;
+        // Mettre à jour le statut de la tâche
+        const updatedTask = await prisma.task.update({
+            where: { id: Number(id) },
+            data: {
+                statutId: newStatusId,  // Nouveau statut de la tâche
+            },
+        });
+
+        // Ajouter à l'historique de la tâche (mise à jour du statut)
+        await prisma.historique.create({
+            data: {
+                taskId: updatedTask.id,
+                utilisateurId: utilisateurId, // ID de l'utilisateur ayant effectué la mise à jour
+                action: ActionType.MODIFICATION, // Utilisation de l'enum ActionType
+                dateAction: Date.now(),  // Utilisation du timestamp EPOCH
+            },
+        });
+
+        return updatedTask;  // Retourne la tâche mise à jour
     }
+
+    // Si la tâche n'existe pas, on retourne null
     return null;
 };
 
-// Modifier la tache
-export const UpdateTask = (id, updatedTask) => {
-    const task = tasks.find((task) => task.id === Number(id));
+
+// Fonction pour modifier la tache
+export const updateTask = async (id, updatedTaskData, utilisateurId) => {
+    // Chercher la tâche dans la base de données
+    const task = await prisma.task.findUnique({
+        where: { id : Number(id) },
+    });
+
     if (task) {
-        task.titre = updatedTask.titre;
-        task.description = updatedTask.description;
-        task.priorité = updatedTask.priorité;
-        task.statut = updatedTask.statut;
-        task.dateLimite = updatedTask.dateLimite;
-
-        // Ajouter à l'historique des modifications
-        task.historique.push({
-            date: new Date(),
-            action: "Mise à jour",
-            utilisateur: "Admin"
+        // Mettre à jour les attributs de la tâche dans la base de données
+        const taskToUpdate  = await prisma.task.update({
+            where: { id : Number(id) },
+            data: {
+                titre: updatedTaskData.titre,
+                description: updatedTaskData.description,
+                prioriteId: updatedTaskData.prioriteId,
+                statutId: updatedTaskData.statutId,
+                dateLimite: updatedTaskData.dateLimite,
+            },
         });
+      
 
-        return task;
+      // Ajouter à l'historique de la tâche (modification)
+      await prisma.historique.create({
+        data: {
+            taskId: taskToUpdate .id,
+            utilisateurId: utilisateurId,  // ID de l'utilisateur ayant effectué la mise à jour
+            action: ActionType.MODIFICATION, // Utilisation de l'enum ActionType
+            dateAction: Date.now(),  // Utilisation du timestamp EPOCH
+        },
+    });
+
+        return taskToUpdate ; // Retourner la tâche mise à jour
     }
+   
+    // Si la tâche n'existe pas, retourner null
     return null;
 };
 
 
  //Fonction pour supprimer une tache
- export const deleteTask = (id) => {
-    const index = tasks.findIndex((task) => task.id === Number(id)); // Convertie en nombre
-    if (index !== -1) {
-        return tasks.splice(index, 1)[0]; // Supprime et retourne la tâche supprimée
+ export const deleteTask = async (id, utilisateurId) => {
+    // Chercher la tâche dans la base de données
+    const task = await prisma.task.findUnique({
+        where: { id: Number(id) },
+    });
+   
+    if (task) {
+        // Supprimer la tâche de la base de données
+        await prisma.task.delete({
+            where: { id: Number(id) },
+        });
+
+        // Ajouter à l'historique de la tâche (suppression)
+        await prisma.historique.create({
+            data: {
+                taskId: Number(id),
+                utilisateurId: utilisateurId, // ID de l'utilisateur ayant effectué la suppression
+                action: ActionType.SUPPRESSION, // Utilisation de l'enum ActionType
+                dateAction: Date.now(), // Utilisation du timestamp EPOCH
+            },
+        });
+
+        return task; //retourne la tâche supprimée
     }
-    return null;
+
+       // Si la tâche n'existe pas, retourner null
+       return null;
 };
 

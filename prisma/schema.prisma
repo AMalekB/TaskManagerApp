@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ActionType {
+  CREATION
+  MODIFICATION
+  SUPPRESSION
+}
+
+model Task {
+  id            Int          @id @default(autoincrement())
+  titre         String
+  description   String
+  prioriteId    Int
+  priorite      Priorite     @relation(fields: [prioriteId], references: [id])
+  statutId      Int
+  statut        Statut       @relation(fields: [statutId], references: [id])
+  utilisateurId Int
+  utilisateur   Utilisateur  @relation(fields: [utilisateurId], references: [id])
+  dateLimite    BigInt // ✅ Stocker la date en millisecondes (EPOCH)
+  historiques   Historique[] // 👈 Une tâche peut avoir plusieurs historiques
+}
+
+model Priorite {
+  id     Int    @id @default(autoincrement())
+  niveau String @unique
+  tasks  Task[]
+}
+
+model Statut {
+  id    Int    @id @default(autoincrement())
+  type  String @unique // Ex: "À faire", "En cours", "Terminée"
+  tasks Task[]
+}
+
+model Utilisateur {
+  id          Int          @id @default(autoincrement())
+  nom         String       @unique
+  email       String       @unique
+  tasks       Task[]
+  historiques Historique[]
+}
+
+model Historique {
+  id            Int         @id @default(autoincrement())
+  taskId        Int
+  task          Task        @relation(fields: [taskId], references: [id]) // 👈 Lien vers la tâche
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  action        ActionType
+  dateAction    DateTime    @default(now())
+}
