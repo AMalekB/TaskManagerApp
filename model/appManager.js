@@ -18,8 +18,8 @@ export const addTask = async (task) => {
         data:{
             titre: task.titre,
             description: task.description,
-            prioriteId: task.prioriteId,
-            statutId: task.statutId,
+            prioriteId: Number(task.prioriteId),
+            statutId: Number(task.statutId),
             utilisateurId: task.utilisateurId,
             dateLimite: new Date(task.dateLimite), //Convertir la dateLimite en un objet Date
         },
