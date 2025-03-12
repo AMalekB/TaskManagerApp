@@ -1,4 +1,43 @@
 let currentTask;
+let currentPriority = "3"; // Valeur par défaut
+
+// Fonction utilitaire pour convertir l'ID de priorité en texte
+function getPriorityText(priorityId) {
+    // Conversion explicite en string et nettoyage
+    priorityId = String(priorityId).trim();
+    console.log('getPriorityText - input:', priorityId, 'type:', typeof priorityId);
+    
+    switch(priorityId) {
+        case "1":
+            return "Élevée";
+        case "2":
+            return "Moyenne";
+        case "3":
+            return "Faible";
+        default:
+            console.warn('getPriorityText - priorité invalide:', priorityId);
+            return "Faible";
+    }
+}
+
+// Fonction utilitaire pour convertir le texte de priorité en ID
+function getPriorityId(priorityText) {
+    // Nettoyage du texte
+    priorityText = priorityText.trim();
+    console.log('getPriorityId - input:', priorityText);
+    
+    switch(priorityText) {
+        case "Élevée":
+            return "1";
+        case "Moyenne":
+            return "2";
+        case "Faible":
+            return "3";
+        default:
+            console.warn('getPriorityId - texte invalide:', priorityText);
+            return "3";
+    }
+}
 
 // Ouvrir la modale d'ajout de tâche
 function openAddTaskModal() {
@@ -12,7 +51,54 @@ function openEditTaskModal(task) {
     currentTask = task;
     document.getElementById("editTaskTitle").value = task.querySelector("h6").innerText;
     document.getElementById("editTaskDescription").value = task.querySelector("p").innerText;
-    document.getElementById("editTaskPriority").value = task.querySelector(".task-priority").innerText.split(": ")[1];
+    
+    // Gestion de la priorité
+    const priorityElement = task.querySelector(".task-priority");
+    const priorityText = priorityElement.innerText.split(": ")[1].trim();
+    console.log('openEditTaskModal - Priorité extraite:', priorityText);
+    const priorityId = getPriorityId(priorityText);
+    currentPriority = priorityId; // Stockage de la priorité initiale
+    console.log('openEditTaskModal - ID converti:', priorityId);
+    
+    // Sélectionner la bonne option dans le select
+    const prioritySelect = document.getElementById("editTaskPriority");
+    
+    // Supprimer les anciens écouteurs d'événements et créer un nouveau select
+    const newPrioritySelect = document.createElement('select');
+    newPrioritySelect.className = prioritySelect.className;
+    newPrioritySelect.id = prioritySelect.id;
+    
+    // Créer les options dans l'ordre
+    const options = [
+        { value: "1", text: "Élevée" },
+        { value: "2", text: "Moyenne" },
+        { value: "3", text: "Faible" }
+    ];
+    
+    options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.text;
+        if (opt.value === priorityId) {
+            option.selected = true;
+        }
+        newPrioritySelect.appendChild(option);
+    });
+    
+    // Remplacer l'ancien select
+    prioritySelect.parentNode.replaceChild(newPrioritySelect, prioritySelect);
+    
+    // Ajouter le nouvel écouteur
+    newPrioritySelect.addEventListener('change', function(event) {
+        const newValue = event.target.value;
+        console.log('Changement de priorité:', {
+            from: currentPriority,
+            to: newValue,
+            text: event.target.options[event.target.selectedIndex].text
+        });
+        currentPriority = newValue;
+    });
+    
     document.getElementById("editTaskDueDate").value = task.querySelector(".task-due-date").innerText.split(": ")[1];
 
     const modal = new bootstrap.Modal(document.getElementById("editTaskModal"));
@@ -128,40 +214,126 @@ async function saveEditedTask() {
 
     const title = document.getElementById("editTaskTitle").value;
     const description = document.getElementById("editTaskDescription").value;
-    const priority = document.getElementById("editTaskPriority").value;
     const dueDate = document.getElementById("editTaskDueDate").value;
+    
+    // Vérification finale de la priorité
+    const prioritySelect = document.getElementById("editTaskPriority");
+    const selectedPriority = prioritySelect.value;
+    const selectedOption = prioritySelect.options[prioritySelect.selectedIndex];
+    
+    console.log('Détails du select au moment de la sauvegarde:', {
+        allOptions: Array.from(prioritySelect.options).map(opt => ({
+            value: opt.value,
+            text: opt.text,
+            selected: opt.selected
+        })),
+        selectedIndex: prioritySelect.selectedIndex,
+        selectedValue: selectedPriority,
+        selectedText: selectedOption ? selectedOption.text : 'aucun'
+    });
+    
+    // Utiliser la valeur du select
+    currentPriority = selectedPriority;
+    const priorityText = getPriorityText(currentPriority);
 
-    // Modifier la tâche localement
-    currentTask.querySelector("h6").innerText = title;
-    currentTask.querySelector("p").innerText = description;
-    currentTask.querySelector(".task-priority").innerText = "Priorité: " + priority;
-    currentTask.querySelector(".task-due-date").innerText = "Date limite: " + dueDate;
+    console.log('Données avant envoi:', {
+        id: taskId,
+        title,
+        description,
+        priority: {
+            id: currentPriority,
+            text: priorityText
+        },
+        dueDate
+    });
+
+    // Validation des champs
+    if (!title || !description || !currentPriority || !dueDate) {
+        alert("Tous les champs sont obligatoires");
+        return;
+    }
 
     try {
+        // Récupérer le statut actuel de la tâche
+        const statusSelect = currentTask.querySelector("#taskStatus");
+        let currentStatus = 1; // Par défaut "À faire"
+        
+        if (statusSelect) {
+            const statusValue = statusSelect.value;
+            switch(statusValue) {
+                case "todo":
+                    currentStatus = 1;
+                    break;
+                case "in-progress":
+                    currentStatus = 2;
+                    break;
+                case "in-review":
+                    currentStatus = 3;
+                    break;
+                case "done":
+                    currentStatus = 4;
+                    break;
+            }
+        }
+
+        const taskData = {
+            titre: title,
+            description: description,
+            prioriteId: parseInt(currentPriority),
+            statutId: currentStatus,
+            dateLimite: new Date(dueDate).toISOString(),
+            utilisateurId: 1
+        };
+
+        console.log('Données envoyées au serveur:', taskData);
+
         const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                titre: title,
-                description: description,
-                prioriteId: priority,
-                dateLimite: dueDate,
-            })
+            body: JSON.stringify(taskData)
         });
 
+        const responseData = await response.json();
+        console.log('Réponse brute du serveur:', responseData);
+
         if (!response.ok) {
-            console.warn('Erreur lors de la sauvegarde de la tâche');
-            return;
+            throw new Error(responseData.error || 'Erreur lors de la sauvegarde');
         }
 
-        const data = await response.json();
-        console.log('Tâche modifiée :', data);
-        closeModal("editTaskModal");
+        // Mettre à jour l'interface avec les nouvelles données
+        const taskContent = currentTask.querySelector('.border');
+        if (taskContent) {
+            taskContent.querySelector("h6").textContent = title;
+            taskContent.querySelector("p").textContent = description;
+            console.log('Mise à jour de l\'interface - priorité:', {
+                id: currentPriority,
+                text: priorityText,
+                element: taskContent.querySelector(".task-priority")
+            });
+            
+            // Forcer la mise à jour de la priorité
+            const priorityElement = taskContent.querySelector(".task-priority");
+            priorityElement.textContent = "Priorité: " + priorityText;
+            
+            // Mettre à jour la date
+            taskContent.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
+
+            // Forcer un rafraîchissement de l'affichage
+            taskContent.style.display = 'none';
+            taskContent.offsetHeight; // Force un reflow
+            taskContent.style.display = '';
+        } else {
+            console.error('Structure de la tâche invalide:', currentTask);
+        }
+
+        // Fermer la modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("editTaskModal"));
+        if (modal) modal.hide();
     } catch (error) {
-        console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de la sauvegarde de la tâche.');
+        console.error('Erreur détaillée:', error);
+        alert('Une erreur est survenue lors de la sauvegarde de la tâche: ' + error.message);
     }
 }
 
@@ -173,34 +345,42 @@ function createTaskElement(title, description, priority, dueDate) {
     const task = template.content.cloneNode(true);
     const taskContainer = document.createElement("div");
 
-    task.querySelector("h6").textContent = title;
-    task.querySelector("p").textContent = description;
-    
-    // Convertir l'ID de priorité en texte
-    let priorityText = "Faible";
-    if (priority === "1") priorityText = "Élevée";
-    else if (priority === "2") priorityText = "Moyenne";
-    else if (priority === "3") priorityText = "Faible";
-    
-    task.querySelector(".task-priority").textContent = "Priorité: " + priorityText;
-    task.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
+    const taskContent = task.querySelector('.border');
+    if (taskContent) {
+        taskContent.querySelector("h6").textContent = title;
+        taskContent.querySelector("p").textContent = description;
+        const priorityText = getPriorityText(priority);
+        console.log('Création élément - priorité:', {
+            id: priority,
+            text: priorityText
+        });
+        taskContent.querySelector(".task-priority").textContent = "Priorité: " + priorityText;
+        taskContent.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
 
-    const taskStatusSelect = task.querySelector("#taskStatus");
-    taskStatusSelect.addEventListener("change", function(event) {
-        changeStatus(event, taskContainer);
-    });
+        const taskStatusSelect = taskContent.querySelector("#taskStatus");
+        // Définir la valeur initiale du select en fonction de la colonne parente
+        const parentColumn = taskContainer.parentElement;
+        if (parentColumn) {
+            taskStatusSelect.value = parentColumn.id;
+        }
+        
+        taskStatusSelect.addEventListener("change", function(event) {
+            changeStatus(event, taskContainer);
+        });
 
-    const editButton = task.querySelector(".btn-warning");
-    editButton.addEventListener("click", function () {
-        openEditTaskModal(taskContainer);
-    });
+        const editButton = taskContent.querySelector(".btn-warning");
+        editButton.addEventListener("click", function () {
+            openEditTaskModal(taskContainer);
+        });
 
-    const deleteButton = task.querySelector(".btn-danger");
-    deleteButton.addEventListener("click", function () {
-        deleteTask(taskContainer);
-    });
+        const deleteButton = taskContent.querySelector(".btn-danger");
+        deleteButton.addEventListener("click", function () {
+            deleteTask(taskContainer);
+        });
 
-    taskContainer.appendChild(task);
+        taskContainer.appendChild(taskContent);
+    }
+
     return taskContainer;
 }
 
@@ -243,32 +423,49 @@ async function changeStatus(event, taskContainer) {
         });
 
         if (!response.ok) {
-            console.warn('Erreur lors de la mise à jour du statut');
-            return;
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de la mise à jour du statut');
         }
 
         // Si la mise à jour a réussi, déplacer la tâche dans l'interface
+        let targetColumn;
         switch(taskStatus) {
             case "todo":
-                document.getElementById("todo").appendChild(taskDiv);
+                targetColumn = document.getElementById("todo");
                 break;
             case "in-progress":
-                document.getElementById("in-progress").appendChild(taskDiv);
+                targetColumn = document.getElementById("in-progress");
                 break;
             case "in-review":
-                document.getElementById("in-review").appendChild(taskDiv);
+                targetColumn = document.getElementById("in-review");
                 break;
             case "done":
-                document.getElementById("done").appendChild(taskDiv);
+                targetColumn = document.getElementById("done");
                 break;
             default:
-                document.getElementById("todo").appendChild(taskDiv);
+                targetColumn = document.getElementById("todo");
+        }
+
+        // Déplacer la tâche
+        targetColumn.appendChild(taskDiv);
+
+        // Mettre à jour le select pour refléter le nouveau statut
+        const statusSelect = taskDiv.querySelector("#taskStatus");
+        if (statusSelect) {
+            statusSelect.value = taskStatus;
+            
+            // Forcer un rafraîchissement visuel
+            statusSelect.style.display = 'none';
+            statusSelect.offsetHeight;
+            statusSelect.style.display = '';
         }
 
         console.log('Statut mis à jour avec succès');
     } catch (error) {
         console.error('Erreur:', error);
-        alert('Une erreur est survenue lors du changement de statut.');
+        alert('Une erreur est survenue lors du changement de statut: ' + error.message);
+        // Remettre le select à sa valeur précédente
+        event.target.value = taskDiv.parentElement.id;
     }
 }
 
@@ -293,23 +490,37 @@ async function loadExistingTasks() {
 
             // Ajouter dans la bonne colonne selon le statut
             let targetColumn;
+            let statusValue;
             switch (task.statutId) {
                 case 1:
                     targetColumn = "todo";
+                    statusValue = "todo";
                     break;
                 case 2:
                     targetColumn = "in-progress";
+                    statusValue = "in-progress";
                     break;
                 case 3:
                     targetColumn = "in-review";
+                    statusValue = "in-review";
                     break;
                 case 4:
                     targetColumn = "done";
+                    statusValue = "done";
                     break;
                 default:
                     targetColumn = "todo";
+                    statusValue = "todo";
             }
+            
+            // Ajouter la tâche à la colonne
             document.getElementById(targetColumn).appendChild(taskElement);
+            
+            // Mettre à jour le select pour refléter le statut actuel
+            const statusSelect = taskElement.querySelector("#taskStatus");
+            if (statusSelect) {
+                statusSelect.value = statusValue;
+            }
         });
     } catch (error) {
         console.error('Erreur:', error);
