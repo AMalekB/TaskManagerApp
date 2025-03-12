@@ -131,7 +131,17 @@ async function saveEditedTask() {
     const priority = document.getElementById("editTaskPriority").value;
     const dueDate = document.getElementById("editTaskDueDate").value;
 
+    // Validation des champs
+    if (!title || !description || !priority || !dueDate) {
+        alert("Tous les champs sont obligatoires");
+        return;
+    }
+
     try {
+        // Récupérer le statut actuel ou utiliser la valeur par défaut (1 pour "À faire")
+        const statusSelect = currentTask.querySelector("#taskStatus");
+        const currentStatus = statusSelect ? parseInt(statusSelect.value) : 1;
+
         const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
             method: 'PUT',
             headers: {
@@ -141,8 +151,8 @@ async function saveEditedTask() {
                 titre: title,
                 description: description,
                 prioriteId: parseInt(priority),
-                statutId: parseInt(currentTask.querySelector("#taskStatus").value),
-                dateLimite: dueDate,
+                statutId: currentStatus,
+                dateLimite: new Date(dueDate).toISOString(),
                 utilisateurId: 1
             })
         });
@@ -155,10 +165,16 @@ async function saveEditedTask() {
         const data = await response.json();
         console.log('Tâche modifiée :', data);
 
+        // Convertir l'ID de priorité en texte
+        let priorityText = "Faible";
+        if (priority === "1") priorityText = "Élevée";
+        else if (priority === "2") priorityText = "Moyenne";
+        else if (priority === "3") priorityText = "Faible";
+
         // Modifier la tâche localement seulement après confirmation du serveur
         currentTask.querySelector("h6").innerText = title;
         currentTask.querySelector("p").innerText = description;
-        currentTask.querySelector(".task-priority").innerText = "Priorité: " + priority;
+        currentTask.querySelector(".task-priority").innerText = "Priorité: " + priorityText;
         currentTask.querySelector(".task-due-date").innerText = "Date limite: " + dueDate;
 
         // Fermer la modal
