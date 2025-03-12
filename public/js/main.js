@@ -1,5 +1,33 @@
 let currentTask;
 
+// Fonction utilitaire pour convertir l'ID de priorité en texte
+function getPriorityText(priorityId) {
+    switch(priorityId) {
+        case "1":
+            return "Élevée";
+        case "2":
+            return "Moyenne";
+        case "3":
+            return "Faible";
+        default:
+            return "Faible";
+    }
+}
+
+// Fonction utilitaire pour convertir le texte de priorité en ID
+function getPriorityId(priorityText) {
+    switch(priorityText) {
+        case "Élevée":
+            return "1";
+        case "Moyenne":
+            return "2";
+        case "Faible":
+            return "3";
+        default:
+            return "3";
+    }
+}
+
 // Ouvrir la modale d'ajout de tâche
 function openAddTaskModal() {
     const modal = new bootstrap.Modal(document.getElementById("addTaskModal"));
@@ -12,7 +40,10 @@ function openEditTaskModal(task) {
     currentTask = task;
     document.getElementById("editTaskTitle").value = task.querySelector("h6").innerText;
     document.getElementById("editTaskDescription").value = task.querySelector("p").innerText;
-    document.getElementById("editTaskPriority").value = task.querySelector(".task-priority").innerText.split(": ")[1];
+    
+    const priorityText = task.querySelector(".task-priority").innerText.split(": ")[1];
+    document.getElementById("editTaskPriority").value = getPriorityId(priorityText);
+    
     document.getElementById("editTaskDueDate").value = task.querySelector(".task-due-date").innerText.split(": ")[1];
 
     const modal = new bootstrap.Modal(document.getElementById("editTaskModal"));
@@ -165,16 +196,10 @@ async function saveEditedTask() {
         const data = await response.json();
         console.log('Tâche modifiée :', data);
 
-        // Convertir l'ID de priorité en texte
-        let priorityText = "Faible";
-        if (priority === "1") priorityText = "Élevée";
-        else if (priority === "2") priorityText = "Moyenne";
-        else if (priority === "3") priorityText = "Faible";
-
         // Modifier la tâche localement seulement après confirmation du serveur
         currentTask.querySelector("h6").innerText = title;
         currentTask.querySelector("p").innerText = description;
-        currentTask.querySelector(".task-priority").innerText = "Priorité: " + priorityText;
+        currentTask.querySelector(".task-priority").innerText = "Priorité: " + getPriorityText(priority);
         currentTask.querySelector(".task-due-date").innerText = "Date limite: " + dueDate;
 
         // Fermer la modal
@@ -196,14 +221,7 @@ function createTaskElement(title, description, priority, dueDate) {
 
     task.querySelector("h6").textContent = title;
     task.querySelector("p").textContent = description;
-    
-    // Convertir l'ID de priorité en texte
-    let priorityText = "Faible";
-    if (priority === "1") priorityText = "Élevée";
-    else if (priority === "2") priorityText = "Moyenne";
-    else if (priority === "3") priorityText = "Faible";
-    
-    task.querySelector(".task-priority").textContent = "Priorité: " + priorityText;
+    task.querySelector(".task-priority").textContent = "Priorité: " + getPriorityText(priority);
     task.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
 
     const taskStatusSelect = task.querySelector("#taskStatus");
