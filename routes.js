@@ -47,8 +47,16 @@ router.patch("/api/task/:id/statut", async (request, response) => {
 router.put("/api/task/:id", async (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
-        const { titre, description, priorité, statut, dateLimite, utilisateurId } = request.body;
-        const updatedTask = await updateTask(id, { titre, description, priorité, statut, dateLimite}, utilisateurId );
+        const { titre, description, prioriteId, statutId, dateLimite, utilisateurId } = request.body;
+        console.log('Données reçues:', { titre, description, prioriteId, statutId, dateLimite, utilisateurId });
+        
+        const updatedTask = await updateTask(id, { 
+            titre, 
+            description, 
+            prioriteId: parseInt(prioriteId), 
+            statutId, 
+            dateLimite
+        }, utilisateurId);
 
         if (updatedTask) {
             response.status(200).json({ updatedTask, message: "Tâche mise à jour avec succès" });
@@ -56,6 +64,7 @@ router.put("/api/task/:id", async (request, response) => {
             response.status(404).json({ message: "Tâche non trouvée" });
         }
     } catch (error) {
+        console.error('Erreur lors de la mise à jour:', error);
         response.status(400).json({ error: error.message });
     }
 });   
