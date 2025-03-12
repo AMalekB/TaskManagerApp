@@ -131,12 +131,6 @@ async function saveEditedTask() {
     const priority = document.getElementById("editTaskPriority").value;
     const dueDate = document.getElementById("editTaskDueDate").value;
 
-    // Modifier la tâche localement
-    currentTask.querySelector("h6").innerText = title;
-    currentTask.querySelector("p").innerText = description;
-    currentTask.querySelector(".task-priority").innerText = "Priorité: " + priority;
-    currentTask.querySelector(".task-due-date").innerText = "Date limite: " + dueDate;
-
     try {
         const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
             method: 'PUT',
@@ -146,22 +140,33 @@ async function saveEditedTask() {
             body: JSON.stringify({
                 titre: title,
                 description: description,
-                prioriteId: priority,
+                prioriteId: parseInt(priority),
+                statutId: parseInt(currentTask.querySelector("#taskStatus").value),
                 dateLimite: dueDate,
+                utilisateurId: 1
             })
         });
 
         if (!response.ok) {
-            console.warn('Erreur lors de la sauvegarde de la tâche');
-            return;
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de la sauvegarde');
         }
 
         const data = await response.json();
         console.log('Tâche modifiée :', data);
-        closeModal("editTaskModal");
+
+        // Modifier la tâche localement seulement après confirmation du serveur
+        currentTask.querySelector("h6").innerText = title;
+        currentTask.querySelector("p").innerText = description;
+        currentTask.querySelector(".task-priority").innerText = "Priorité: " + priority;
+        currentTask.querySelector(".task-due-date").innerText = "Date limite: " + dueDate;
+
+        // Fermer la modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("editTaskModal"));
+        if (modal) modal.hide();
     } catch (error) {
         console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de la sauvegarde de la tâche.');
+        alert('Une erreur est survenue lors de la sauvegarde de la tâche: ' + error.message);
     }
 }
 
@@ -243,8 +248,8 @@ async function changeStatus(event, taskContainer) {
         });
 
         if (!response.ok) {
-            console.warn('Erreur lors de la mise à jour du statut');
-            return;
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de la mise à jour du statut');
         }
 
         // Si la mise à jour a réussi, déplacer la tâche dans l'interface
@@ -268,7 +273,9 @@ async function changeStatus(event, taskContainer) {
         console.log('Statut mis à jour avec succès');
     } catch (error) {
         console.error('Erreur:', error);
-        alert('Une erreur est survenue lors du changement de statut.');
+        alert('Une erreur est survenue lors du changement de statut: ' + error.message);
+        // Remettre le select à sa valeur précédente
+        event.target.value = taskDiv.parentElement.id;
     }
 }
 
