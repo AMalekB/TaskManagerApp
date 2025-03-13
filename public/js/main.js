@@ -46,6 +46,45 @@ function openAddTaskModal() {
 }
 document.querySelector(".btn-primary").addEventListener("click", openAddTaskModal);
 
+
+// Fonction pour ouvrir la modale des détails
+function openTaskDetailsModal(task) {
+    const taskId = task.getAttribute('data-id');
+
+    // Récupérer les détails de la tâche
+    document.getElementById("taskDetailTitle").innerText = task.querySelector("h6").innerText;
+    document.getElementById("taskDetailDescription").innerText = task.querySelector("p").innerText;
+    document.getElementById("taskDetailPriority").innerText = task.querySelector(".task-priority").innerText.split(": ")[1].trim();
+    document.getElementById("taskDetailDueDate").innerText = task.querySelector(".task-due-date").innerText.split(": ")[1].trim();
+
+    // Charger l'historique de la tâche
+    fetch(`http://localhost:5000/api/task/${taskId}/history`)
+    .then(response => response.json())
+    .then(data => {
+        const historyList = document.getElementById("taskHistoryList");
+        historyList.innerHTML = ""; // Nettoyer l'historique précédent
+        
+        if (data.historique && data.historique.length > 0) {
+            data.historique.forEach(entry => {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item";
+                listItem.innerHTML = `<strong>${entry.utilisateur.nom}</strong> - ${entry.action.toLowerCase()} (${new Date(entry.dateAction).toLocaleString()})`;
+                historyList.appendChild(listItem);
+            });
+        } else {
+            const emptyItem = document.createElement("li");
+            emptyItem.className = "list-group-item text-muted";
+            emptyItem.innerText = "Aucune modification enregistrée.";
+            historyList.appendChild(emptyItem);
+        }
+    })
+    .catch(error => console.error("Erreur lors du chargement de l'historique :", error));
+
+    // Ouvrir la modale
+    const modal = new bootstrap.Modal(document.getElementById("taskDetailsModal"));
+    modal.show();
+}
+
 // Ouvrir la modale d'édition de tâche
 function openEditTaskModal(task) {
     currentTask = task;
@@ -358,7 +397,8 @@ function createTaskElement(title, description, priority, dueDate) {
         taskContent.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
 
         const taskStatusSelect = taskContent.querySelector("#taskStatus");
-        // Définir la valeur initiale du select en fonction de la colonne parente
+    
+         // Définir la valeur initiale du select en fonction de la colonne parente
         const parentColumn = taskContainer.parentElement;
         if (parentColumn) {
             taskStatusSelect.value = parentColumn.id;
@@ -378,11 +418,21 @@ function createTaskElement(title, description, priority, dueDate) {
             deleteTask(taskContainer);
         });
 
+        // Ajout du bouton "Détails" après Modifier et Supprimer**
+        const detailsButton = document.createElement("button");
+        detailsButton.className = "btn btn-sm btn-info mt-2 view-details";
+        detailsButton.innerText = "Détails";
+        detailsButton.addEventListener("click", function () {
+            openTaskDetailsModal(taskContainer);
+        });
+
+        taskContent.appendChild(detailsButton);
         taskContainer.appendChild(taskContent);
     }
 
     return taskContainer;
 }
+
 
 // Changer le statut de la tâche
 async function changeStatus(event, taskContainer) {
