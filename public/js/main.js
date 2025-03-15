@@ -1,3 +1,6 @@
+// Définir l'URL de base de l'API
+const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/api`;
+
 let currentTask;
 let currentPriority = "3"; // Valeur par défaut
 
@@ -31,6 +34,7 @@ function getPriorityId(priorityText) {
             return "1";
         case "Moyenne":
             return "2";
+    
         case "Faible":
             return "3";
         default:
@@ -177,7 +181,7 @@ async function addTask() {
         };
         console.log('Données envoyées au serveur:', taskData);
 
-        const response = await fetch('http://localhost:5000/api/task', {
+        const response = await fetch(`${API_BASE_URL}/task`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -221,7 +225,7 @@ async function deleteTask(task) {
     }
 
     try {
-        const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
+        const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
             method: 'DELETE',
         });
 
@@ -326,7 +330,7 @@ async function saveEditedTask() {
 
         console.log('Données envoyées au serveur:', taskData);
 
-        const response = await fetch(`http://localhost:5000/api/task/${taskId}`, {
+        const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -461,7 +465,7 @@ async function changeStatus(event, taskContainer) {
 
     try {
         // Mettre à jour le statut dans la base de données
-        const response = await fetch(`http://localhost:5000/api/task/${taskId}/statut`, {
+        const response = await fetch(`${API_BASE_URL}/task/${taskId}/statut`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -522,7 +526,7 @@ async function changeStatus(event, taskContainer) {
 // Charger les tâches existantes
 async function loadExistingTasks() {
     try {
-        const response = await fetch('http://localhost:5000/api/tasks');
+        const response = await fetch(`${API_BASE_URL}/tasks`);
         if (!response.ok) {
             throw new Error('Erreur lors du chargement des tâches');
         }
