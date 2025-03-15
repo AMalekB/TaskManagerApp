@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllTasks, addTask, updateTaskStatus, updateTask, deleteTask } from "./model/appManager.js";
+import { getAllTasks, addTask, updateTaskStatus, updateTask, deleteTask, getTaskHistory } from "./model/appManager.js";
 
 const router = Router();
 
@@ -25,6 +25,23 @@ router.get("/api/tasks", async (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
+
+// Récupérer l'historique des modifications d'une tâche
+router.get("/api/task/:id/history", async (request, response) => {
+    try {
+        const id = parseInt(request.params.id, 10);
+        const historique = await getTaskHistory(id);
+
+        if (historique.length > 0) {
+            response.status(200).json({ historique });
+        } else {
+            response.status(404).json({ message: "Aucune modification trouvée" });
+        }
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
+});
+
 
 // Modifier le statut d'une tâche
 router.patch("/api/task/:id/statut", async (request, response) => {
