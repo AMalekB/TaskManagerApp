@@ -1,5 +1,5 @@
 // Définir l'URL de base de l'API
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/api`;
+const API_BASE_URL = 'http://localhost:5000/api';
 
 let currentTask;
 let currentPriority = "3"; // Valeur par défaut
