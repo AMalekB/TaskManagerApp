@@ -237,34 +237,42 @@ async function addTask() {
 async function deleteTask(task) {
     if (!task) return;
 
-    const taskId = task.getAttribute('data-id');
+    const taskId = task.getAttribute('data-id');  // Récupérer l'ID de la tâche
     if (!taskId) {
         console.warn("ID de tâche manquant.");
         return;
     }
 
     try {
+        // Envoyer la requête DELETE au serveur
         const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ utilisateurId: 1 })  // Ajout du body attendu par le serveur
+            body: JSON.stringify({ utilisateurId: 1 })  // Données nécessaires pour la suppression
         });
 
+        // Si la suppression n'a pas fonctionné
         if (!response.ok) {
             const errorData = await response.json();
             console.warn('Erreur lors de la suppression de la tâche:', errorData);
             return;
         }
 
+        // Si la suppression est confirmée
         console.log('Tâche supprimée avec succès');
+        
+        // Supprimer immédiatement la tâche du DOM
         task.remove();
+
     } catch (error) {
         console.error('Erreur:', error);
         alert('Une erreur est survenue lors de la suppression de la tâche.');
     }
 }
+
+
 
 document.querySelectorAll('.delete-task-button').forEach(button => {
     button.addEventListener('click', () => {

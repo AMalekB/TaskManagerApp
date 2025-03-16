@@ -92,27 +92,47 @@ export const updateTask = async (id, updatedTaskData, utilisateurId) => {
     return null;
 };
 
+
 // Fonction pour supprimer une tâche
 export const deleteTask = async (id, utilisateurId) => {
-    const task = await prisma.task.findUnique({ where: { id: Number(id) } });
+    try {
+        // 1. Vérifier que l'utilisateur existe
+        const utilisateur = await prisma.utilisateur.findUnique({
+            where: { id: Number(utilisateurId) }
+        });
 
-    if (task) {
-        await prisma.task.delete({ where: { id: Number(id) } });
+        if (!utilisateur) {
+            throw new Error("Utilisateur non valide");
+        }
 
-        // Ajouter à l'historique de la tâche (suppression)
-        await prisma.historique.create({
-            data: {
-                task: { connect: { id: Number(id) } },
-                utilisateurId: { connect: { id: utilisateurId } },
-                action: ActionType.SUPPRESSION,
-                dateAction: new Date(),
-            },
+        // 2. Récupérer la tâche
+        const task = await prisma.task.findUnique({ 
+            where: { id: Number(id) } 
+        });
+
+        if (!task) return null;
+
+        // 3. Créer l'entrée d'historique AVANT suppression
+        //await prisma.historique.create({
+        //    data: {
+          //      task: { connect: { id: Number(id) } },
+            //    utilisateurId: { connect: { id: Number(utilisateurId) } },
+              //  action: ActionType.SUPPRESSION,
+                //dateAction: new Date(),
+            //},
+        //});
+
+        // 4. Supprimer la tâche APRÈS l'historique
+        await prisma.task.delete({ 
+            where: { id: Number(id) } 
         });
 
         return task;
-    }
 
-    return null;
+    } catch (error) {
+        console.error("Erreur deleteTask :", error);
+        throw new Error(error.message || "Échec de la suppression");
+    }
 };
 
 // ✅ Nouvelle fonction pour récupérer l'historique d'une tâche
