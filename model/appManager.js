@@ -103,7 +103,7 @@ export const deleteTask = async (id, utilisateurId) => {
         await prisma.historique.create({
             data: {
                 task: { connect: { id: Number(id) } },
-                utilisateurId: utilisateurId,
+                utilisateurId: { connect: { id: utilisateurId } },
                 action: ActionType.SUPPRESSION,
                 dateAction: new Date(),
             },
