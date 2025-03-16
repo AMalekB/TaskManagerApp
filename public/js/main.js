@@ -50,7 +50,6 @@ function openAddTaskModal() {
 }
 document.querySelector(".btn-primary").addEventListener("click", openAddTaskModal);
 
-
 // Fonction pour ouvrir la modale des détails
 function openTaskDetailsModal(task) {
     const taskId = task.getAttribute('data-id');
@@ -149,10 +148,30 @@ function openEditTaskModal(task) {
 }
 
 // Fermer une modale Bootstrap
+//function closeModal(modalId) {
+  //  const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    //if (modal) modal.hide();
+//}
 function closeModal(modalId) {
-    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
-    if (modal) modal.hide();
-}
+    const modalElement = document.getElementById(modalId);
+    let modal = bootstrap.Modal.getInstance(modalElement);
+    if (!modal) {
+      modal = new bootstrap.Modal(modalElement);
+    }
+    modal.hide();
+    
+    modalElement.addEventListener('hidden.bs.modal', function () {
+      // Retirer la classe qui empêche le scroll
+      document.body.classList.remove('modal-open');
+      // Réactiver le scroll en rétablissant l'overflow
+      document.body.style.overflow = 'auto';
+      // Supprimer le backdrop résiduel, s'il existe
+      document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
+        backdrop.remove();
+      });
+    }, { once: true });
+  }
+  
 
 // Ajouter une tâche
 document.getElementById("addTaskButton").addEventListener("click", addTask);
@@ -227,10 +246,15 @@ async function deleteTask(task) {
     try {
         const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
             method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ utilisateurId: 1 })  // Ajout du body attendu par le serveur
         });
 
         if (!response.ok) {
-            console.warn('Erreur lors de la suppression de la tâche');
+            const errorData = await response.json();
+            console.warn('Erreur lors de la suppression de la tâche:', errorData);
             return;
         }
 
@@ -241,6 +265,14 @@ async function deleteTask(task) {
         alert('Une erreur est survenue lors de la suppression de la tâche.');
     }
 }
+
+document.querySelectorAll('.delete-task-button').forEach(button => {
+    button.addEventListener('click', () => {
+        const taskElement = button.closest('.task'); // Assurez-vous que cette sélection correspond à votre structure HTML
+        deleteTask(taskElement);
+    });
+});
+
 
 // Sauvegarder les modifications d'une tâche
 async function saveEditedTask() {
@@ -436,7 +468,6 @@ function createTaskElement(title, description, priority, dueDate) {
 
     return taskContainer;
 }
-
 
 // Changer le statut de la tâche
 async function changeStatus(event, taskContainer) {
