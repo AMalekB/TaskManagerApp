@@ -1,0 +1,22 @@
+<!-- Modale pour afficher les détails d'une tâche -->
+<div class="modal fade" id="taskDetailsModal" tabindex="-1" aria-labelledby="taskDetailsLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskDetailsLabel">Détails de la tâche</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="taskDetailTitle"></h6>
+                <p id="taskDetailDescription"></p>
+                <p><strong>Priorité :</strong> <span id="taskDetailPriority"></span></p>
+                <p><strong>Date limite :</strong> <span id="taskDetailDueDate"></span></p>
+
+                <h6>Historique des modifications :</h6>
+                <ul id="taskHistoryList" class="list-group">
+                    <!-- Historique des modifications sera ajouté dynamiquement -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div> 

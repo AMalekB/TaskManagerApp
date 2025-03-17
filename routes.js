@@ -3,6 +3,22 @@ import { getAllTasks, addTask, updateTaskStatus, updateTask, deleteTask, getTask
 
 const router = Router();
 
+// Route principale - rendu avec Handlebars
+router.get("/", async (request, response) => {
+    try {
+        const ListeTaches = await getAllTasks();
+        response.render("home", { 
+            tasks: ListeTaches,
+            title: "Task Manager - Accueil"
+        });
+    } catch (error) {
+        response.status(500).render("error", { 
+            message: "Erreur lors du chargement des tâches",
+            error: error.message
+        });
+    }
+});
+
 // Ajouter une tâche
 router.post("/api/task", async (request, response) => {
     const tacheEntrée = request.body;

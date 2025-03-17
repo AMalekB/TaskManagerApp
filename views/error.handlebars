@@ -1,0 +1,11 @@
+<div class="container mt-5">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Erreur</h4>
+        <p>{{message}}</p>
+        {{#if error}}
+        <hr>
+        <p class="mb-0">Détails techniques : {{error}}</p>
+        {{/if}}
+    </div>
+    <a href="/" class="btn btn-primary">Retour à l'accueil</a>
+</div> 

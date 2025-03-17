@@ -10,9 +10,15 @@ import helmet from "helmet";
 import compression from "compression";
 import cors from "cors";
 import cspOption from "./csp-options.js";
+import { engine } from 'express-handlebars';
 
 // Crréation du serveur express
 const app = express();
+
+// Configuration de Handlebars
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', './views');
 
 // Ajout de middlewares
 app.use(helmet(cspOption));

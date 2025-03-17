@@ -1,0 +1,38 @@
+<!-- Création de 4 colonnes reflétant les 4 statuts possibles pour une tâche -->
+<div class="container py-4">
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+        <i data-lucide="plus-circle"></i> Ajouter une tâche
+    </button>
+    
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-warning text-dark text-center">À faire</div>
+                <div class="card-body" id="todo"></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-info text-white text-center">En cours</div>
+                <div class="card-body" id="in-progress"></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-center">En révision</div>
+                <div class="card-body" id="in-review"></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-success text-white text-center">Terminée</div>
+                <div class="card-body" id="done"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{> addTaskModal}}
+{{> editTaskModal}}
+{{> taskDetailsModal}}
+{{> taskTemplate}} 

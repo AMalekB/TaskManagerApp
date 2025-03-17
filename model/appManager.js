@@ -135,7 +135,7 @@ export const deleteTask = async (id, utilisateurId) => {
     }
 };
 
-// ✅ Nouvelle fonction pour récupérer l'historique d'une tâche
+// Nouvelle fonction pour récupérer l'historique d'une tâche
 export const getTaskHistory = async (taskId) => {
     return await prisma.historique.findMany({
         where: { taskId: Number(taskId) },
