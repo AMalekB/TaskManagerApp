@@ -9,7 +9,31 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <header class="bg-dark text-white py-3">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <a href="/" class="text-white text-decoration-none">
+            <h1 class="h3 m-0">TaskManager</h1>
+        </a>
+        <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Rechercher..." aria-label="Search">
+            <button class="btn btn-outline-light" type="submit">Rechercher</button>
+        </form>
+        <div>
+            <i data-lucide="user" class="text-white" style="width: 32px; height: 32px;"></i>
+        </div>
+    </div>
+</header>
+
+<main class="container my-4">
     {{{body}}}
+</main>
+
+<footer class="bg-dark text-white text-center py-3">
+    <p class="mb-0">
+        &copy; Abdelmalek Bezri, Mamadou Lamine Sall, Saddem Chorfi, Taha Ait Bella | Collège La Cité
+    </p>
+</footer>
+   
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="/js/main.js"></script>
