@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getAllTasks, addTask, updateTaskStatus, updateTask, deleteTask, getTaskHistory } from "./model/appManager.js";
+import { validateTaskData, validateStatus, validateUser } from "./validation.js";
 
 const router = Router();
 
@@ -22,7 +23,16 @@ router.get("/", async (request, response) => {
 // Ajouter une tâche
 router.post("/api/task", async (request, response) => {
     const tacheEntrée = request.body;
-    try {
+    try { 
+        // Validation des données
+        const validation = validateTaskData(tacheEntrée);
+        if (!validation.isValid) {
+            return response.status(400).json({ 
+                error: "Données invalides", 
+                details: validation.errors  
+            });
+        }
+
         const NouvelleTache = await addTask(tacheEntrée);
         response
             .status(200)
@@ -64,6 +74,25 @@ router.patch("/api/task/:id/statut", async (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
         const { statut, utilisateurId } = request.body;
+
+        // Validation du statut
+        const statusValidation = validateStatus(statut);
+        if (!statusValidation.isValid) {
+            return response.status(400).json({ 
+                error: "Statut invalide", 
+                details: statusValidation.message 
+            });
+        }
+
+        // Validation de l'utilisateur
+        const userValidation = validateUser(utilisateurId);
+        if (!userValidation.isValid) {
+            return response.status(400).json({ 
+                error: "Utilisateur invalide", 
+                details: userValidation.message 
+            });
+        }
+
         const updatedTask = await updateTaskStatus(id, statut, utilisateurId);
 
         if (updatedTask) {
@@ -80,16 +109,25 @@ router.patch("/api/task/:id/statut", async (request, response) => {
 router.put("/api/task/:id", async (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
-        const { titre, description, prioriteId, statutId, dateLimite, utilisateurId } = request.body;
-        console.log('Données reçues:', { titre, description, prioriteId, statutId, dateLimite, utilisateurId });
+        const taskData = request.body;
+        console.log('Données reçues:', taskData); 
         
+        // Validation des données
+        const validation = validateTaskData(taskData);
+        if (!validation.isValid) {
+            return response.status(400).json({ 
+                error: "Données invalides", 
+                details: validation.errors 
+            });
+        }
+
         const updatedTask = await updateTask(id, { 
-            titre, 
-            description, 
-            prioriteId: parseInt(prioriteId), 
-            statutId, 
-            dateLimite
-        }, utilisateurId);
+            titre: taskData.titre, 
+            description: taskData.description, 
+            prioriteId: parseInt(taskData.prioriteId), 
+            statutId: taskData.statutId, 
+            dateLimite: taskData.dateLimite
+        }, taskData.utilisateurId);
 
         if (updatedTask) {
             response.status(200).json({ updatedTask, message: "Tâche mise à jour avec succès" });
@@ -106,8 +144,18 @@ router.put("/api/task/:id", async (request, response) => {
 router.delete("/api/task/:id", async (request, response) => {
     try {
         const id = parseInt(request.params.id, 10);
-        const { utilisateurId } = request.body;  // Récupérer l'utilisateur depuis le body
-        const deletedTask = await deleteTask(id, utilisateurId);
+        const { utilisateurId } = request.body;
+
+        // Validation de l'utilisateur
+        const userValidation = validateUser(utilisateurId);
+        if (!userValidation.isValid) {
+            return response.status(400).json({  
+                error: "Utilisateur invalide", 
+                details: userValidation.message 
+            });
+        }
+
+        const deletedTask = await deleteTask(id, utilisateurId); 
 
         if (deletedTask) {
             response.status(200).json({ message: "Tâche supprimée avec succès", deletedTask });

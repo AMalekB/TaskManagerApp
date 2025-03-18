@@ -10,11 +10,21 @@
                 <form id="addTaskForm">
                     <div class="mb-3">
                         <label for="taskTitle" class="form-label">Titre:</label>
-                        <input type="text" class="form-control" id="taskTitle" required>
+                        <input type="text" class="form-control" id="taskTitle" required 
+                               minlength="5" maxlength="15" 
+                               placeholder="Entre 5 et 15 caractères">
+                        <div class="form-text">
+                            <span id="taskTitleCount">0</span>/15 caractères
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="taskDescription" class="form-label">Description:</label>
-                        <textarea class="form-control" id="taskDescription" required></textarea>
+                        <textarea class="form-control" id="taskDescription" required 
+                                  minlength="5" maxlength="1000" 
+                                  placeholder="Entre 5 et 1000 caractères"></textarea>
+                        <div class="form-text">
+                            <span id="taskDescriptionCount">0</span>/1000 caractères
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="taskPriority" class="form-label">Priorité:</label>

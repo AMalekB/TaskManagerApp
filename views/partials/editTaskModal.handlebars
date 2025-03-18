@@ -10,11 +10,21 @@
                 <form id="editTaskForm">
                     <div class="mb-3">
                         <label for="editTaskTitle" class="form-label">Titre:</label>
-                        <input type="text" class="form-control" id="editTaskTitle" required>
+                        <input type="text" class="form-control" id="editTaskTitle" required 
+                               minlength="5" maxlength="15" 
+                               placeholder="Entre 5 et 15 caractères">
+                        <div class="form-text">
+                            <span id="editTaskTitleCount">0</span>/15 caractères
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="editTaskDescription" class="form-label">Description:</label>
-                        <textarea class="form-control" id="editTaskDescription" required></textarea>
+                        <textarea class="form-control" id="editTaskDescription" required 
+                                  minlength="5" maxlength="1000" 
+                                  placeholder="Entre 5 et 1000 caractères"></textarea>
+                        <div class="form-text">
+                            <span id="editTaskDescriptionCount">0</span>/1000 caractères
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="editTaskPriority" class="form-label">Priorité:</label>
