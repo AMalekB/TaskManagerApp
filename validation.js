@@ -1,10 +1,10 @@
 // Fonction pour vérifier si une chaîne contient des caractères spéciaux
 export function containsSpecialCharacters(str) {
     // Regex pour détecter les caractères spéciaux (sauf les accents)
-    const specialCharsRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    const specialCharsRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|<>\/?]/;
     return specialCharsRegex.test(str);
 }
-
+ 
 // Validation du titre
 export function validateTitle(title) {
     if (!title || title.trim().length === 0) {

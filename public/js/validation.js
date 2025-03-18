@@ -22,7 +22,7 @@ export function validateTitle(title) {
         return { isValid: false, message: "Le titre ne peut pas dépasser 15 caractères" };
     }
     if (containsSpecialCharacters(title)) {
-        return { isValid: false, message: "Le titre ne peut pas contenir de caractères spéciaux dangereux" };
+        return { isValid: false, message: "Le titre ne peut pas contenir de caractères spéciaux" };
     }
     if (hasMultipleSpaces(title)) {
         return { isValid: false, message: "Le titre ne peut pas contenir d'espaces multiples" };
@@ -42,7 +42,7 @@ export function validateDescription(description) {
         return { isValid: false, message: "La description ne peut pas dépasser 1000 caractères" };
     }
     if (containsSpecialCharacters(description)) {
-        return { isValid: false, message: "La description ne peut pas contenir de caractères spéciaux dangereux" };
+        return { isValid: false, message: "La description ne peut pas contenir de caractères spéciaux" };
     }
     if (hasMultipleSpaces(description)) {
         return { isValid: false, message: "La description ne peut pas contenir d'espaces multiples" };
@@ -156,5 +156,5 @@ export function removeExistingErrors() {
     const existingErrors = document.querySelectorAll('.alert-danger');
     existingErrors.forEach(error => error.remove());
 }
-
+ 
  
