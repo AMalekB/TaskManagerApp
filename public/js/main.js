@@ -488,13 +488,13 @@ function createTaskElement(title, description, priority, dueDate) {
         taskContent.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
 
         const taskStatusSelect = taskContent.querySelector("#taskStatus");
-    
-         // Définir la valeur initiale du select en fonction de la colonne parente
+
+        // Définir la valeur initiale du select en fonction de la colonne parente
         const parentColumn = taskContainer.parentElement;
         if (parentColumn) {
             taskStatusSelect.value = parentColumn.id;
         }
-        
+
         taskStatusSelect.addEventListener("change", function(event) {
             changeStatus(event, taskContainer);
         });
@@ -509,21 +509,25 @@ function createTaskElement(title, description, priority, dueDate) {
             deleteTask(taskContainer);
         });
 
-        // Ajout du bouton "Détails" après Modifier et Supprimer**
-        const detailsButton = document.createElement("button");
-        detailsButton.className = "btn btn-sm btn-info mt-2 view-details";
-        detailsButton.innerText = "Détails";
+        const detailsButton = taskContent.querySelector(".btn-success"); 
         detailsButton.addEventListener("click", function () {
             openTaskDetailsModal(taskContainer);
         });
 
-        taskContent.appendChild(detailsButton);
+        // Créer un container pour les boutons Modifier, Supprimer et Détails
+        const buttonContainer = document.createElement("div");
+        buttonContainer.className = "d-flex gap-2 mt-2"; 
+
+        buttonContainer.appendChild(editButton);
+        buttonContainer.appendChild(deleteButton);
+        buttonContainer.appendChild(detailsButton); 
+
+        taskContent.appendChild(buttonContainer);
         taskContainer.appendChild(taskContent);
     }
 
     return taskContainer;
 }
-
 // Changer le statut de la tâche
 async function changeStatus(event, taskContainer) {
     const taskStatus = event.target.value;
