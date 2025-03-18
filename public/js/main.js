@@ -1,6 +1,17 @@
 // Définir l'URL de base de l'API
 const API_BASE_URL = 'http://localhost:5000/api';
 
+// Importer les fonctions de validation
+import { 
+    validateTitle, 
+    validateDescription, 
+    validatePriority, 
+    validateDueDate, 
+    validateTaskData,
+    showError,
+    removeExistingErrors 
+} from './validation.js';
+
 let currentTask;
 let currentPriority = "3"; // Valeur par défaut
 
@@ -133,7 +144,7 @@ function openEditTaskModal(task) {
     // Ajouter le nouvel écouteur
     newPrioritySelect.addEventListener('change', function(event) {
         const newValue = event.target.value;
-        console.log('Changement de priorité:', {
+        console.log('Changement de priorité:', { 
             from: currentPriority,
             to: newValue,
             text: event.target.options[event.target.selectedIndex].text
@@ -176,28 +187,66 @@ function closeModal(modalId) {
 // Ajouter une tâche
 document.getElementById("addTaskButton").addEventListener("click", addTask);
 
-// Créer la tâche et l'envoyer au backend
+// Fonction pour vérifier si une chaîne contient des caractères spéciaux
+function containsSpecialCharacters(str) {
+    // Regex pour détecter les caractères spéciaux (sauf les accents)
+    const specialCharsRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    return specialCharsRegex.test(str);
+}
+
+// Modifier la fonction addTask
 async function addTask() {
+    removeExistingErrors();
+    
     const title = document.getElementById("taskTitle").value;
     const description = document.getElementById("taskDescription").value;
     const priority = document.getElementById("taskPriority").value;
     const dueDate = document.getElementById("taskDueDate").value;
 
-    // Validation de la priorité
-    if (!priority || isNaN(parseInt(priority))) {
-        alert("Veuillez sélectionner une priorité valide");
+    // Validation des champs
+    const titleValidation = validateTitle(title);
+    if (!titleValidation.isValid) {
+        document.getElementById("taskTitle").parentNode.appendChild(showError(titleValidation.message));
+        return;
+    }
+
+    const descriptionValidation = validateDescription(description);
+    if (!descriptionValidation.isValid) {
+        document.getElementById("taskDescription").parentNode.appendChild(showError(descriptionValidation.message));
+        return;
+    }
+
+    const priorityValidation = validatePriority(priority);
+    if (!priorityValidation.isValid) {
+        document.getElementById("taskPriority").parentNode.appendChild(showError(priorityValidation.message));
+        return;
+    }
+
+    const dueDateValidation = validateDueDate(dueDate);
+    if (!dueDateValidation.isValid) {
+        document.getElementById("taskDueDate").parentNode.appendChild(showError(dueDateValidation.message));
         return;
     }
 
     try {
         const taskData = {
-            titre: title,
-            description: description,
+            titre: title.trim(),
+            description: description.trim(),
             prioriteId: parseInt(priority),
             statutId: 1,
             utilisateurId: 1,
             dateLimite: dueDate
         };
+
+        // Validation complète des données
+        const validation = validateTaskData(taskData);
+        if (!validation.isValid) {
+            validation.errors.forEach(error => {
+                alert(error);
+            });
+            return;
+        }
+
         console.log('Données envoyées au serveur:', taskData);
 
         const response = await fetch(`${API_BASE_URL}/task`, {
@@ -208,14 +257,12 @@ async function addTask() {
             body: JSON.stringify(taskData)
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errorData = await response.json();
-            console.warn('Erreur lors de l\'ajout de la tâche:', errorData);
-            alert(`Erreur: ${errorData.error || 'Une erreur est survenue'}`);
-            return;
+            throw new Error(data.error || 'Une erreur est survenue lors de l\'ajout de la tâche');
         }
 
-        const data = await response.json();
         console.log('Tâche ajoutée :', data);
 
         // Créer l'élément de la tâche avec les données retournées par le serveur
@@ -229,7 +276,7 @@ async function addTask() {
         document.getElementById("addTaskForm").reset();
     } catch (error) {
         console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de l\'ajout de la tâche.');
+        alert(error.message || 'Une erreur est survenue lors de l\'ajout de la tâche.');
     }
 }
 
@@ -282,12 +329,14 @@ document.querySelectorAll('.delete-task-button').forEach(button => {
 });
 
 
-// Sauvegarder les modifications d'une tâche
+// Modifier la fonction saveEditedTask
 async function saveEditedTask() {
     if (!currentTask) {
         console.warn("Aucune tâche sélectionnée pour l'édition.");
         return;
     }
+
+    removeExistingErrors();
 
     const taskId = currentTask.getAttribute('data-id');
     if (!taskId) {
@@ -298,41 +347,31 @@ async function saveEditedTask() {
     const title = document.getElementById("editTaskTitle").value;
     const description = document.getElementById("editTaskDescription").value;
     const dueDate = document.getElementById("editTaskDueDate").value;
-    
-    // Vérification finale de la priorité
     const prioritySelect = document.getElementById("editTaskPriority");
     const selectedPriority = prioritySelect.value;
-    const selectedOption = prioritySelect.options[prioritySelect.selectedIndex];
-    
-    console.log('Détails du select au moment de la sauvegarde:', {
-        allOptions: Array.from(prioritySelect.options).map(opt => ({
-            value: opt.value,
-            text: opt.text,
-            selected: opt.selected
-        })),
-        selectedIndex: prioritySelect.selectedIndex,
-        selectedValue: selectedPriority,
-        selectedText: selectedOption ? selectedOption.text : 'aucun'
-    });
-    
-    // Utiliser la valeur du select
-    currentPriority = selectedPriority;
-    const priorityText = getPriorityText(currentPriority);
-
-    console.log('Données avant envoi:', {
-        id: taskId,
-        title,
-        description,
-        priority: {
-            id: currentPriority,
-            text: priorityText
-        },
-        dueDate
-    });
 
     // Validation des champs
-    if (!title || !description || !currentPriority || !dueDate) {
-        alert("Tous les champs sont obligatoires");
+    const titleValidation = validateTitle(title);
+    if (!titleValidation.isValid) {
+        document.getElementById("editTaskTitle").parentNode.appendChild(showError(titleValidation.message));
+        return;
+    }
+
+    const descriptionValidation = validateDescription(description);
+    if (!descriptionValidation.isValid) {
+        document.getElementById("editTaskDescription").parentNode.appendChild(showError(descriptionValidation.message));
+        return;
+    }
+
+    const priorityValidation = validatePriority(selectedPriority);
+    if (!priorityValidation.isValid) {
+        document.getElementById("editTaskPriority").parentNode.appendChild(showError(priorityValidation.message));
+        return;
+    }
+
+    const dueDateValidation = validateDueDate(dueDate);
+    if (!dueDateValidation.isValid) {
+        document.getElementById("editTaskDueDate").parentNode.appendChild(showError(dueDateValidation.message));
         return;
     }
 
@@ -360,13 +399,22 @@ async function saveEditedTask() {
         }
 
         const taskData = {
-            titre: title,
-            description: description,
-            prioriteId: parseInt(currentPriority),
+            titre: title.trim(),
+            description: description.trim(),
+            prioriteId: parseInt(selectedPriority),
             statutId: currentStatus,
             dateLimite: new Date(dueDate).toISOString(),
             utilisateurId: 1
         };
+
+        // Validation complète des données
+        const validation = validateTaskData(taskData);
+        if (!validation.isValid) {
+            validation.errors.forEach(error => {
+                alert(error);
+            });
+            return;
+        }
 
         console.log('Données envoyées au serveur:', taskData);
 
@@ -379,7 +427,6 @@ async function saveEditedTask() {
         });
 
         const responseData = await response.json();
-        console.log('Réponse brute du serveur:', responseData);
 
         if (!response.ok) {
             throw new Error(responseData.error || 'Erreur lors de la sauvegarde');
@@ -390,25 +437,9 @@ async function saveEditedTask() {
         if (taskContent) {
             taskContent.querySelector("h6").textContent = title;
             taskContent.querySelector("p").textContent = description;
-            console.log('Mise à jour de l\'interface - priorité:', {
-                id: currentPriority,
-                text: priorityText,
-                element: taskContent.querySelector(".task-priority")
-            });
-            
-            // Forcer la mise à jour de la priorité
-            const priorityElement = taskContent.querySelector(".task-priority");
-            priorityElement.textContent = "Priorité: " + priorityText;
-            
-            // Mettre à jour la date
+            const priorityText = getPriorityText(selectedPriority);
+            taskContent.querySelector(".task-priority").textContent = "Priorité: " + priorityText;
             taskContent.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
-
-            // Forcer un rafraîchissement de l'affichage
-            taskContent.style.display = 'none';
-            taskContent.offsetHeight; // Force un reflow
-            taskContent.style.display = '';
-        } else {
-            console.error('Structure de la tâche invalide:', currentTask);
         }
 
         // Fermer la modal
@@ -416,7 +447,7 @@ async function saveEditedTask() {
         if (modal) modal.hide();
     } catch (error) {
         console.error('Erreur détaillée:', error);
-        alert('Une erreur est survenue lors de la sauvegarde de la tâche: ' + error.message);
+        alert(error.message || 'Une erreur est survenue lors de la sauvegarde de la tâche');
     }
 }
 
@@ -622,3 +653,44 @@ async function loadExistingTasks() {
 
 // Charger les tâches au démarrage
 document.addEventListener('DOMContentLoaded', loadExistingTasks);
+
+// Gestionnaires pour les compteurs de caractères
+document.addEventListener('DOMContentLoaded', function() {
+    // Compteurs pour la modale d'ajout
+    const taskTitle = document.getElementById('taskTitle');
+    const taskTitleCount = document.getElementById('taskTitleCount');
+    const taskDescription = document.getElementById('taskDescription');
+    const taskDescriptionCount = document.getElementById('taskDescriptionCount');
+
+    // Compteurs pour la modale d'édition
+    const editTaskTitle = document.getElementById('editTaskTitle');
+    const editTaskTitleCount = document.getElementById('editTaskTitleCount');
+    const editTaskDescription = document.getElementById('editTaskDescription');
+    const editTaskDescriptionCount = document.getElementById('editTaskDescriptionCount');
+
+    // Mise à jour des compteurs pour la modale d'ajout
+    if (taskTitle && taskTitleCount) {
+        taskTitle.addEventListener('input', function() {
+            taskTitleCount.textContent = this.value.length;
+        });
+    }
+
+    if (taskDescription && taskDescriptionCount) {
+        taskDescription.addEventListener('input', function() {
+            taskDescriptionCount.textContent = this.value.length;
+        });
+    }
+
+    // Mise à jour des compteurs pour la modale d'édition
+    if (editTaskTitle && editTaskTitleCount) {
+        editTaskTitle.addEventListener('input', function() {
+            editTaskTitleCount.textContent = this.value.length;
+        });
+    }
+
+    if (editTaskDescription && editTaskDescriptionCount) {
+        editTaskDescription.addEventListener('input', function() {
+            editTaskDescriptionCount.textContent = this.value.length;
+        });
+    }
+});

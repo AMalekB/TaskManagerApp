@@ -17,12 +17,12 @@ const app = express();
 
 // Configuration de Handlebars
 app.engine('handlebars', engine());
-app.set('view engine', 'handlebars');
-app.set('views', './views');
+app.set('view engine', 'handlebars'); 
+app.set('views', './views'); 
 
 // Ajout de middlewares
 app.use(helmet(cspOption));
-app.use(compression());
+app.use(compression());   
 app.use(cors());
 app.use(json());
 
