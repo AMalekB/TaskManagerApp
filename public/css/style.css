@@ -1,12 +1,12 @@
 * {
-    font-family: var(--bs-font-monospace);
+    font-family:Bitter
 }
 
 body {
     background: linear-gradient(to right, #5f5f94, #342b82);
-    min-height: 100vh; 
+    min-height: 100vh;
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
 
 header {
@@ -16,16 +16,58 @@ header {
 
 h1 {
     font-size: 28px;
-    font-weight: 700; 
+    font-weight: 700;
 }
 
 footer {
     background: linear-gradient(to right, #313157, #1d1939);
-    height: 30px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 14px; 
-    padding: 0; 
-    margin-top: auto; 
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    padding: 0;
+    margin-top: auto;
 }
+
+.d-flex {
+    display: flex;
+    flex-direction: row; 
+    align-items: center; 
+}
+
+.gap-2 {
+    gap: 0.5rem; 
+}
+
+.mt-2 {
+    margin-top: 0.5rem; 
+}
+
+
+.btn-warning.btn-sm,
+.btn-danger.btn-sm,
+.btn-success.btn-sm { 
+    height: 30px; 
+    line-height: 20px; 
+    padding-top: 5px; 
+    padding-bottom: 5px; /
+}
+
+.task-description-short { 
+    white-space: nowrap; 
+    overflow: hidden;     
+    text-overflow: ellipsis; 
+    margin-bottom: 0; 
+    margin-right: 0px; 
+}
+.description-priority-container {
+    display: flex;
+    align-items:baseline; 
+    margin-bottom: 0;
+}
+
+
+
+
+
