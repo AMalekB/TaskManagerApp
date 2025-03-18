@@ -12,8 +12,8 @@ import {
     removeExistingErrors 
 } from './validation.js';
 
-// Fonction de validation combinée pour le titre et la description
-function validateTitleAndDescription(title, description) {
+// Fonction de validation combinée pour le titre, la description et la date
+function validateTitleAndDescription(title, description, dueDate) {
     const errors = [];
     
     // Validation du titre
@@ -26,6 +26,12 @@ function validateTitleAndDescription(title, description) {
     const descriptionValidation = validateDescription(description);
     if (!descriptionValidation.isValid) {
         errors.push({ field: 'description', message: descriptionValidation.message });
+    }
+
+    // Validation de la date
+    const dueDateValidation = validateDueDate(dueDate);
+    if (!dueDateValidation.isValid) {
+        errors.push({ field: 'dueDate', message: dueDateValidation.message });
     }
 
     return {
@@ -225,10 +231,10 @@ async function addTask() {
     const priority = document.getElementById("taskPriority").value;
     const dueDate = document.getElementById("taskDueDate").value;
 
-    // Validation combinée du titre et de la description
-    const titleDescValidation = validateTitleAndDescription(title, description);
-    if (!titleDescValidation.isValid) {
-        titleDescValidation.errors.forEach(error => {
+    // Validation combinée du titre, de la description et de la date
+    const validation = validateTitleAndDescription(title, description, dueDate);
+    if (!validation.isValid) {
+        validation.errors.forEach(error => {
             const element = document.getElementById(`task${error.field.charAt(0).toUpperCase() + error.field.slice(1)}`);
             if (element) {
                 element.parentNode.appendChild(showError(error.message));
@@ -237,16 +243,10 @@ async function addTask() {
         return;
     }
 
-    // Validation des autres champs
+    // Validation de la priorité
     const priorityValidation = validatePriority(priority);
     if (!priorityValidation.isValid) {
         document.getElementById("taskPriority").parentNode.appendChild(showError(priorityValidation.message));
-        return;
-    }
-
-    const dueDateValidation = validateDueDate(dueDate);
-    if (!dueDateValidation.isValid) {
-        document.getElementById("taskDueDate").parentNode.appendChild(showError(dueDateValidation.message));
         return;
     }
 
@@ -372,10 +372,10 @@ async function saveEditedTask() {
     const prioritySelect = document.getElementById("editTaskPriority");
     const selectedPriority = prioritySelect.value;
 
-    // Validation combinée du titre et de la description
-    const titleDescValidation = validateTitleAndDescription(title, description);
-    if (!titleDescValidation.isValid) {
-        titleDescValidation.errors.forEach(error => {
+    // Validation combinée du titre, de la description et de la date
+    const validation = validateTitleAndDescription(title, description, dueDate);
+    if (!validation.isValid) {
+        validation.errors.forEach(error => {
             const element = document.getElementById(`editTask${error.field.charAt(0).toUpperCase() + error.field.slice(1)}`);
             if (element) {
                 element.parentNode.appendChild(showError(error.message));
@@ -384,16 +384,10 @@ async function saveEditedTask() {
         return;
     }
 
-    // Validation des autres champs
+    // Validation de la priorité
     const priorityValidation = validatePriority(selectedPriority);
     if (!priorityValidation.isValid) {
         document.getElementById("editTaskPriority").parentNode.appendChild(showError(priorityValidation.message));
-        return;
-    }
-
-    const dueDateValidation = validateDueDate(dueDate);
-    if (!dueDateValidation.isValid) {
-        document.getElementById("editTaskDueDate").parentNode.appendChild(showError(dueDateValidation.message));
         return;
     }
 

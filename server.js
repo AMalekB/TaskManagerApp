@@ -12,10 +12,10 @@ import cors from "cors";
 import cspOption from "./csp-options.js";
 import { engine } from 'express-handlebars';
 
-// Crréation du serveur express
+// Crréation du serveur express 
 const app = express();
-
-// Configuration de Handlebars
+ 
+// Configuration de Handlebars 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars'); 
 app.set('views', './views'); 
