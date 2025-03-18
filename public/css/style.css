@@ -54,3 +54,20 @@ footer {
     padding-bottom: 5px; /
 }
 
+.task-description-short { 
+    white-space: nowrap; 
+    overflow: hidden;     
+    text-overflow: ellipsis; 
+    margin-bottom: 0; 
+    margin-right: 0px; 
+}
+.description-priority-container {
+    display: flex;
+    align-items:baseline; 
+    margin-bottom: 0;
+}
+
+
+
+
+

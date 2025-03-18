@@ -92,23 +92,20 @@ document.querySelector(".btn-primary").addEventListener("click", openAddTaskModa
 // Fonction pour ouvrir la modale des détails
 function openTaskDetailsModal(task) {
     const taskId = task.getAttribute('data-id');
+    const fullDescription = task.dataset.fullDescription; // Récupérer la description complète
 
     // Récupérer les détails de la tâche
     document.getElementById("taskDetailTitle").innerText = task.querySelector("h6").innerText;
-    document.getElementById("taskDetailDescription").innerText = task.querySelector("p").innerText;
-
-    const priorityText = task.querySelector(".task-priority").innerText.split(": ")[1].trim();
-    document.getElementById("taskDetailPriority").querySelector("span:last-child").innerText = priorityText;
-
-    const dueDateText = task.querySelector(".task-due-date").innerText.split(": ")[1].trim();
-    document.getElementById("taskDetailDueDate").querySelector("span:last-child").innerText = dueDateText;
+    document.getElementById("taskDetailDescription").innerText = fullDescription; // Afficher la description complète
+    document.getElementById("taskDetailPriority").innerText = task.querySelector(".task-priority").innerText.split(": ")[1].trim();
+    document.getElementById("taskDetailDueDate").innerText = task.querySelector(".task-due-date").innerText.split(": ")[1].trim();
 
     // Charger l'historique de la tâche (inchangé)
     fetch(`http://localhost:5000/api/task/${taskId}/history`)
     .then(response => response.json())
     .then(data => {
         const historyList = document.getElementById("taskHistoryList");
-        historyList.innerHTML = ""; // Nettoyer l'historique précédent
+        historyList.innerHTML = "";
 
         if (data.historique && data.historique.length > 0) {
             data.historique.forEach(entry => {
@@ -481,24 +478,38 @@ function createTaskElement(title, description, priority, dueDate) {
 
     const taskContent = task.querySelector('.border');
     if (taskContent) {
-        taskContent.querySelector("h6").textContent = title;
-        taskContent.querySelector("p").textContent = description;
+        const titleElement = taskContent.querySelector("h6");
+        titleElement.textContent = title;
+
+        // Élément pour la description courte dans la liste
+        const shortDescriptionElement = document.createElement("p");
+        shortDescriptionElement.className = "task-description-short";
+        shortDescriptionElement.textContent = description;
+
+        const priorityElement = taskContent.querySelector(".task-priority");
         const priorityText = getPriorityText(priority);
-        console.log('Création élément - priorité:', {
-            id: priority,
-            text: priorityText
-        });
-        taskContent.querySelector(".task-priority").textContent = "Priorité: " + priorityText;
-        taskContent.querySelector(".task-due-date").textContent = "Date limite: " + dueDate;
+        priorityElement.textContent = "Priorité: " + priorityText;
+
+        const dueDateElement = taskContent.querySelector(".task-due-date");
+        dueDateElement.textContent = "Date limite: " + dueDate;
+
+        // Insérer la priorité après la description courte (sur la même ligne)
+        shortDescriptionElement.insertAdjacentText('afterend', ' '); // Ajouter un espace si nécessaire
+        shortDescriptionElement.insertAdjacentElement('afterend', priorityElement);
+
+        // Supprimer l'ancienne insertion de la priorité et le <br> dans le template n'est plus nécessaire ici
+
+        // Insérer la description après le titre
+        titleElement.insertAdjacentElement('afterend', shortDescriptionElement);
+
+        // Stocker la description complète comme attribut de données
+        taskContainer.dataset.fullDescription = description;
 
         const taskStatusSelect = taskContent.querySelector("#taskStatus");
-
-        // Définir la valeur initiale du select en fonction de la colonne parente
         const parentColumn = taskContainer.parentElement;
         if (parentColumn) {
             taskStatusSelect.value = parentColumn.id;
         }
-
         taskStatusSelect.addEventListener("change", function(event) {
             changeStatus(event, taskContainer);
         });
@@ -513,20 +524,24 @@ function createTaskElement(title, description, priority, dueDate) {
             deleteTask(taskContainer);
         });
 
-        const detailsButton = taskContent.querySelector(".btn-success"); 
+        const detailsButton = taskContent.querySelector(".btn-success");
         detailsButton.addEventListener("click", function () {
             openTaskDetailsModal(taskContainer);
         });
 
-        // Créer un container pour les boutons Modifier, Supprimer et Détails
-        const buttonContainer = document.createElement("div");
-        buttonContainer.className = "d-flex gap-2 mt-2"; 
+        const buttonContainer = taskContent.querySelector(".d-flex"); // Sélectionner le conteneur existant
+        // Assurez-vous que le conteneur existe dans votre template, sinon créez-le comme avant
+        if (!buttonContainer) {
+            const newButtonContainer = document.createElement("div");
+            newButtonContainer.className = "d-flex gap-2 mt-2";
+            newButtonContainer.appendChild(editButton);
+            newButtonContainer.appendChild(deleteButton);
+            newButtonContainer.appendChild(detailsButton);
+            taskContent.appendChild(newButtonContainer);
+        } else {
+            // Si le conteneur existe, les boutons devraient déjà y être (selon votre template)
+        }
 
-        buttonContainer.appendChild(editButton);
-        buttonContainer.appendChild(deleteButton);
-        buttonContainer.appendChild(detailsButton); 
-
-        taskContent.appendChild(buttonContainer);
         taskContainer.appendChild(taskContent);
     }
 

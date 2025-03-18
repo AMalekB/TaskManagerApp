@@ -2,23 +2,24 @@
 <template id="taskTemplate">
     <div class="border p-2 mb-2 bg-white rounded">
         <h6></h6>
-        <p></p>
-        <small class="task-priority"></small><br>
+        <div class="description-priority-container">
+            <p class="task-description-short"></p> <small class="task-priority"></small>
+        </div>
         <small class="task-due-date"></small><br>
         <button class="btn btn-sm btn-warning mt-2">
             <i data-lucide="edit"></i> Modifier
         </button>
         <button class="btn btn-sm btn-danger mt-2 delete-task-button">
-            <i data-lucide="trash-2"></i> Supprimer 
+            <i data-lucide="trash-2"></i> Supprimer
         </button>
-        <button class="btn btn-sm btn-success mt-2 delete-task-button">
-            <i data-lucide="trash-2"></i> Détails 
+        <button class="btn btn-sm btn-success mt-2">
+            <i data-lucide="trash-2"></i> Détails
         </button>
         <select class="form-select mt-2" aria-label="Default select example" id="taskStatus">
             <option value="todo" selected>À faire</option>
             <option value="in-progress">En cours</option>
             <option value="in-review">En révision</option>
             <option value="done">Terminée</option>
-        </select> 
+        </select>
     </div>
-</template>  
+</template>
