@@ -12,6 +12,28 @@ import {
     removeExistingErrors 
 } from './validation.js';
 
+// Fonction de validation combinée pour le titre et la description
+function validateTitleAndDescription(title, description) {
+    const errors = [];
+    
+    // Validation du titre
+    const titleValidation = validateTitle(title);
+    if (!titleValidation.isValid) {
+        errors.push({ field: 'title', message: titleValidation.message });
+    }
+
+    // Validation de la description
+    const descriptionValidation = validateDescription(description);
+    if (!descriptionValidation.isValid) {
+        errors.push({ field: 'description', message: descriptionValidation.message });
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors: errors
+    };
+}
+
 let currentTask;
 let currentPriority = "3"; // Valeur par défaut
 
@@ -203,19 +225,19 @@ async function addTask() {
     const priority = document.getElementById("taskPriority").value;
     const dueDate = document.getElementById("taskDueDate").value;
 
-    // Validation des champs
-    const titleValidation = validateTitle(title);
-    if (!titleValidation.isValid) {
-        document.getElementById("taskTitle").parentNode.appendChild(showError(titleValidation.message));
+    // Validation combinée du titre et de la description
+    const titleDescValidation = validateTitleAndDescription(title, description);
+    if (!titleDescValidation.isValid) {
+        titleDescValidation.errors.forEach(error => {
+            const element = document.getElementById(`task${error.field.charAt(0).toUpperCase() + error.field.slice(1)}`);
+            if (element) {
+                element.parentNode.appendChild(showError(error.message));
+            }
+        });
         return;
     }
 
-    const descriptionValidation = validateDescription(description);
-    if (!descriptionValidation.isValid) {
-        document.getElementById("taskDescription").parentNode.appendChild(showError(descriptionValidation.message));
-        return;
-    }
-
+    // Validation des autres champs
     const priorityValidation = validatePriority(priority);
     if (!priorityValidation.isValid) {
         document.getElementById("taskPriority").parentNode.appendChild(showError(priorityValidation.message));
@@ -350,19 +372,19 @@ async function saveEditedTask() {
     const prioritySelect = document.getElementById("editTaskPriority");
     const selectedPriority = prioritySelect.value;
 
-    // Validation des champs
-    const titleValidation = validateTitle(title);
-    if (!titleValidation.isValid) {
-        document.getElementById("editTaskTitle").parentNode.appendChild(showError(titleValidation.message));
+    // Validation combinée du titre et de la description
+    const titleDescValidation = validateTitleAndDescription(title, description);
+    if (!titleDescValidation.isValid) {
+        titleDescValidation.errors.forEach(error => {
+            const element = document.getElementById(`editTask${error.field.charAt(0).toUpperCase() + error.field.slice(1)}`);
+            if (element) {
+                element.parentNode.appendChild(showError(error.message));
+            }
+        });
         return;
     }
 
-    const descriptionValidation = validateDescription(description);
-    if (!descriptionValidation.isValid) {
-        document.getElementById("editTaskDescription").parentNode.appendChild(showError(descriptionValidation.message));
-        return;
-    }
-
+    // Validation des autres champs
     const priorityValidation = validatePriority(selectedPriority);
     if (!priorityValidation.isValid) {
         document.getElementById("editTaskPriority").parentNode.appendChild(showError(priorityValidation.message));
@@ -446,8 +468,8 @@ async function saveEditedTask() {
         const modal = bootstrap.Modal.getInstance(document.getElementById("editTaskModal"));
         if (modal) modal.hide();
     } catch (error) {
-        console.error('Erreur détaillée:', error);
-        alert(error.message || 'Une erreur est survenue lors de la sauvegarde de la tâche');
+        console.error('Erreur:', error);
+        alert(error.message || 'Une erreur est survenue lors de la sauvegarde.');
     }
 }
 
