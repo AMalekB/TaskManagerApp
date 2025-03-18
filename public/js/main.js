@@ -96,16 +96,20 @@ function openTaskDetailsModal(task) {
     // Récupérer les détails de la tâche
     document.getElementById("taskDetailTitle").innerText = task.querySelector("h6").innerText;
     document.getElementById("taskDetailDescription").innerText = task.querySelector("p").innerText;
-    document.getElementById("taskDetailPriority").innerText = task.querySelector(".task-priority").innerText.split(": ")[1].trim();
-    document.getElementById("taskDetailDueDate").innerText = task.querySelector(".task-due-date").innerText.split(": ")[1].trim();
 
-    // Charger l'historique de la tâche
+    const priorityText = task.querySelector(".task-priority").innerText.split(": ")[1].trim();
+    document.getElementById("taskDetailPriority").querySelector("span:last-child").innerText = priorityText;
+
+    const dueDateText = task.querySelector(".task-due-date").innerText.split(": ")[1].trim();
+    document.getElementById("taskDetailDueDate").querySelector("span:last-child").innerText = dueDateText;
+
+    // Charger l'historique de la tâche (inchangé)
     fetch(`http://localhost:5000/api/task/${taskId}/history`)
     .then(response => response.json())
     .then(data => {
         const historyList = document.getElementById("taskHistoryList");
         historyList.innerHTML = ""; // Nettoyer l'historique précédent
-        
+
         if (data.historique && data.historique.length > 0) {
             data.historique.forEach(entry => {
                 const listItem = document.createElement("li");
@@ -122,7 +126,7 @@ function openTaskDetailsModal(task) {
     })
     .catch(error => console.error("Erreur lors du chargement de l'historique :", error));
 
-    // Ouvrir la modale
+    // Ouvrir la modale (inchangé)
     const modal = new bootstrap.Modal(document.getElementById("taskDetailsModal"));
     modal.show();
 }

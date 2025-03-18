@@ -1,22 +1,28 @@
 <!-- Modale pour afficher les détails d'une tâche -->
-<div class="modal fade" id="taskDetailsModal" tabindex="-1" aria-labelledby="taskDetailsLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="taskDetailsModal" tabindex="-1" aria-labelledby="taskDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="taskDetailsLabel">Détails de la tâche</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                <h5 class="modal-title" id="taskDetailsModalLabel">Détails de la tâche</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6 id="taskDetailTitle"></h6>
-                <p id="taskDetailDescription"></p>
-                <p><strong>Priorité :</strong> <span id="taskDetailPriority"></span></p>
-                <p><strong>Date limite :</strong> <span id="taskDetailDueDate"></span></p>
+                <h6 class="fw-bold" style="font-size: 1.1rem;">Titre :</h6>
+                <p id="taskDetailTitle" style="font-size: 1rem; margin-bottom: 0.5rem;"></p>
 
-                <h6>Historique des modifications :</h6>
-                <ul id="taskHistoryList" class="list-group">
-                    <!-- Historique des modifications sera ajouté dynamiquement -->
-                </ul>
+                <h6 class="fw-bold" style="font-size: 1.1rem;">Description :</h6>
+                <p id="taskDetailDescription" style="font-size: 1rem; margin-bottom: 0.5rem;"></p>
+
+                <p id="taskDetailPriority" style="font-size: 1rem; margin-bottom: 0.3rem;"><span class="fw-bold">Priorité :</span> <span data-priority-value=""></span></p>
+                <p id="taskDetailDueDate" style="font-size: 1rem; margin-bottom: 0.8rem;"><span class="fw-bold">Date limite :</span> <span></span></p>
+
+                <h6 class="fw-bold" style="font-size: 1.1rem;">Historique des modifications :</h6>
+                <ul class="list-group" id="taskHistoryList" style="font-size: 0.9rem;">
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
-</div> 
+</div>
