@@ -12,10 +12,10 @@ router.get("/", async (request, response) => {
             tasks: ListeTaches,
             title: "Task Manager - Accueil"
         });
-    } catch (error) {
+    } catch (error) { 
         response.status(500).render("error", { 
             message: "Erreur lors du chargement des tâches",
-            error: error.message
+            error: error.message 
         });
     }
 });

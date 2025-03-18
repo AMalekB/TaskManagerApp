@@ -91,46 +91,25 @@ export function validateUser(userId) {
 
 // Validation complète des données d'une tâche
 export function validateTaskData(taskData) {
-    const errors = [];
+    const errors = {};
+    const validations = {
+        titre: validateTitle(taskData.titre),
+        description: validateDescription(taskData.description),
+        prioriteId: validatePriority(taskData.prioriteId),
+        dateLimite: validateDueDate(taskData.dateLimite),
+        statutId: validateStatus(taskData.statutId),
+        utilisateurId: validateUser(taskData.utilisateurId)
+    };
 
-    // Validation du titre
-    const titleValidation = validateTitle(taskData.titre);
-    if (!titleValidation.isValid) {
-        errors.push(titleValidation.message);
-    }
-
-    // Validation de la description
-    const descriptionValidation = validateDescription(taskData.description);
-    if (!descriptionValidation.isValid) {
-        errors.push(descriptionValidation.message); 
-    }
-
-    // Validation de la priorité
-    const priorityValidation = validatePriority(taskData.prioriteId);
-    if (!priorityValidation.isValid) {
-        errors.push(priorityValidation.message);
-    }
-
-    // Validation de la date limite
-    const dueDateValidation = validateDueDate(taskData.dateLimite);
-    if (!dueDateValidation.isValid) {
-        errors.push(dueDateValidation.message);
-    }
-
-    // Validation du statut
-    const statusValidation = validateStatus(taskData.statutId);
-    if (!statusValidation.isValid) {
-        errors.push(statusValidation.message);
-    }
-
-    // Validation de l'utilisateur
-    const userValidation = validateUser(taskData.utilisateurId);
-    if (!userValidation.isValid) {
-        errors.push(userValidation.message);
-    }
+    // Collecter toutes les erreurs
+    Object.entries(validations).forEach(([field, validation]) => {
+        if (!validation.isValid) {
+            errors[field] = validation.message;
+        }
+    });
 
     return {
-        isValid: errors.length === 0,
+        isValid: Object.keys(errors).length === 0,
         errors: errors
     };
 }
