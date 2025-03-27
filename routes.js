@@ -17,6 +17,9 @@ const router = Router();
 
 // Route principale - rendu avec Handlebars
 router.get("/", async (request, response) => {
+  if (!request.session.id_user) {
+    request.session.id_user = 123;
+  }
   try {
     const ListeTaches = await getAllTasks();
     response.render("home", {
