@@ -18,6 +18,9 @@ import session from 'express-session';
 //Importation de la memorystore
 import memorystore from 'memorystore';
 
+// Importation de passeport
+import passport from 'passport';
+
 // Création du serveur express 
 const app = express();
 
@@ -44,6 +47,10 @@ app.use(session({
     saveUninitialized: false,
     secret: process.env.SESSION_SECRET
 }));
+
+// Ajout de middleware pour passeport
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Middeleware integre a express pour gerer la partie static du serveur
 //le dossier 'public' est la partie statique de notre serveur
