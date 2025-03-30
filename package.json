@@ -1,31 +1,32 @@
 {
- "name": "TaskManagerApp",
- "version": "1.0.0",
- "description": "This application helps teams stay organized by facilitating task management, responsibility assignment, and real-time project progress tracking | Cette application permet aux équipes de s'organiser efficacement, en facilitant la gestion des tâches, l’assignation des responsabilités et le suivi de l’avancement des projets en temps réel.",
- "main": "server.js",
- "type": "module",
- "scripts": {
-  "dev": "nodemon server.js",
-  "test": "echo \"Error: no test specified\" && exit 1"
- },
- "author": "Abdelmalek Bezri, Mamadou Lamine Sall, Saddem Chorfi, Taha Ait Bella",
- "license": "UNLICENSED",
- "dependencies": {
-  "@prisma/client": "^6.4.1",
-  "bcrypt": "^5.1.1",
-  "compression": "^1.7.5",
-  "cors": "^2.8.5",
-  "dotenv": "^16.4.7",
-  "express": "^4.21.2",
-  "express-handlebars": "^8.0.1",
-  "express-session": "^1.18.1",
-  "helmet": "^8.0.0",
-  "memorystore": "^1.6.7",
-  "passport": "^0.7.0",
-  "passport-local": "^1.0.0"
- },
- "devDependencies": {
-  "nodemon": "^3.1.9",
-  "prisma": "^6.4.1"
- }
+  "name": "TaskManagerApp",
+  "version": "1.0.0",
+  "description": "This application helps teams stay organized by facilitating task management, responsibility assignment, and real-time project progress tracking | Cette application permet aux équipes de s'organiser efficacement, en facilitant la gestion des tâches, l’assignation des responsabilités et le suivi de l’avancement des projets en temps réel.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "seed": "node prisma/seed.js",
+    "dev": "npm run seed && nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abdelmalek Bezri, Mamadou Lamine Sall, Saddem Chorfi, Taha Ait Bella",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@prisma/client": "^6.4.1",
+    "bcrypt": "^5.1.1",
+    "compression": "^1.7.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-handlebars": "^8.0.1",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "memorystore": "^1.6.7",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "prisma": "^6.4.1"
+  }
 }
