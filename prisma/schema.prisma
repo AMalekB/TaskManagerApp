@@ -46,6 +46,8 @@ model Utilisateur {
   id          Int          @id @default(autoincrement())
   nom         String       @unique
   email       String       @unique
+  password    String
+  role        String
   tasks       Task[]
   historiques Historique[]
 }
