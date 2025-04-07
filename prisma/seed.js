@@ -6,61 +6,170 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Création des priorités
-  const highPriority = await prisma.priorite.create({
-    data: { niveau: "Élevée" }, // On insère une priorité "Élevée"
+  const existingPriority = await prisma.priorite.findFirst({
+    where: { niveau: "Élevée" },
   });
-  const mediumPriority = await prisma.priorite.create({
-    data: { niveau: "Moyenne" }, // On insère une priorité "Moyenne"
+
+  let highPriority;
+
+  if (existingPriority) {
+    highPriority = existingPriority; // Si elle existe déjà, on l'utilise.
+  } else {
+    highPriority = await prisma.priorite.create({
+      data: { niveau: "Élevée" }, // Si elle n'existe pas, on la crée.
+    });
+  }
+
+  const existingMediumPriority = await prisma.priorite.findFirst({
+    where: { niveau: "Moyenne" },
   });
-  const lowPriority = await prisma.priorite.create({
-    data: { niveau: "Faible" }, // On insère une priorité "Faible"
+
+  let mediumPriority;
+
+  if (existingMediumPriority) {
+    mediumPriority = existingMediumPriority; // Si elle existe déjà, on l'utilise.
+  } else {
+    mediumPriority = await prisma.priorite.create({
+      data: { niveau: "Moyenne" }, // Si elle n'existe pas, on la crée.
+    });
+  }
+
+  const existingLowPriority = await prisma.priorite.findFirst({
+    where: { niveau: "Faible" },
   });
+
+  let lowPriority;
+
+  if (existingLowPriority) {
+    lowPriority = existingLowPriority; // Si elle existe déjà, on l'utilise.
+  } else {
+    lowPriority = await prisma.priorite.create({
+      data: { niveau: "Faible" }, // Si elle n'existe pas, on la crée.
+    });
+  }
 
   // Création des statuts
-  const todoStatus = await prisma.statut.create({
-    data: { type: "À faire" }, // On insère un statut "À faire"
+  const existingTodoStatus = await prisma.statut.findFirst({
+    where: { type: "À faire" },
   });
-  const inProgressStatus = await prisma.statut.create({
-    data: { type: "En cours" }, // On insère un statut "En cours"
+
+  let todoStatus;
+
+  if (existingTodoStatus) {
+    todoStatus = existingTodoStatus; // Si le statut existe déjà, on l'assigne
+  } else {
+    todoStatus = await prisma.statut.create({
+      data: { type: "À faire" }, // Sinon, on le crée
+    });
+  }
+
+  const existingInProgressStatus = await prisma.statut.findFirst({
+    where: { type: "En cours" },
   });
-  const inReviewStatus = await prisma.statut.create({
-    data: { type: "En révision" }, // On insère un statut "En révision"
+
+  let inProgressStatus;
+
+  if (existingInProgressStatus) {
+    inProgressStatus = existingInProgressStatus; // Si le statut existe déjà, on l'assigne
+  } else {
+    inProgressStatus = await prisma.statut.create({
+      data: { type: "En cours" }, // Sinon, on le crée
+    });
+  }
+
+  const existingInReviewStatus = await prisma.statut.findFirst({
+    where: { type: "En révision" },
   });
-  const doneStatus = await prisma.statut.create({
-    data: { type: "Terminée" }, // On insère un statut "Terminée"
+
+  let inReviewStatus;
+
+  if (existingInReviewStatus) {
+    inReviewStatus = existingInReviewStatus; // Si le statut existe déjà, on l'assigne
+  } else {
+    inReviewStatus = await prisma.statut.create({
+      data: { type: "En révision" }, // Sinon, on le crée
+    });
+  }
+
+  const existingDoneStatus = await prisma.statut.findFirst({
+    where: { type: "Terminée" },
   });
+
+  let doneStatus;
+
+  if (existingDoneStatus) {
+    doneStatus = existingDoneStatus; // Si le statut existe déjà, on l'assigne
+  } else {
+    doneStatus = await prisma.statut.create({
+      data: { type: "Terminée" }, // Sinon, on le crée
+    });
+  }
 
   // Création d'utilisateurs de test
-  const user1 = await prisma.utilisateur.create({
-    data: {
-      nom: "defaultUser", // Utilisateur par défaut
-      email: "defaultUser@example.com",
-      password: "password",
-      role: "admin",
-    },
+  const existingUser = await prisma.utilisateur.findFirst({
+    where: { email: "defaultUser@example.com" },
   });
+
+  let user1;
+
+  if (existingUser) {
+    user1 = existingUser; // Si l'utilisateur existe déjà, on l'assigne
+  } else {
+    user1 = await prisma.utilisateur.create({
+      data: {
+        nom: "defaultUser",
+        email: "defaultUser@example.com",
+        password: "password",
+        role: "admin",
+      },
+    });
+  }
 
   // Création d'une tâche de test
-  const task = await prisma.task.create({
-    data: {
-      titre: "Ma première tâche",
-      description: "Une tâche pour tester",
-      prioriteId: highPriority.id, // Priorité de la tâche (haute)
-      statutId: todoStatus.id, // Statut de la tâche (à faire)
-      utilisateurId: user1.id, // L'utilisateur associé à la tâche (Utilisateur par défaut)
-      dateLimite: new Date(), // Date limite (timestamp en millisecondes)
+  const existingTask = await prisma.task.findFirst({
+    where: { titre: "Ma première tâche" }, // recherche la tâche par titre
+  });
+
+  let task;
+
+  if (existingTask) {
+    task = existingTask; // Si la tâche existe déjà, on l'assigne
+  } else {
+    task = await prisma.task.create({
+      data: {
+        titre: "Ma première tâche",
+        description: "Une tâche pour tester",
+        prioriteId: highPriority.id,
+        statutId: todoStatus.id,
+        utilisateurId: user1.id,
+        dateLimite: new Date(),
+      },
+    });
+  }
+
+  // Ajout d'un historique pour cette tâche (action de création)
+  const existingHistorique = await prisma.historique.findFirst({
+    where: {
+      taskId: task.id,
+      utilisateurId: user1.id,
+      action: ActionType.CREATION,
     },
   });
 
-  // Ajout d'un historique pour cette tâche (action de création)
-  await prisma.historique.create({
-    data: {
-      taskId: task.id, // L'ID de la tâche
-      utilisateurId: user1.id, // Utilisateur qui a effectué l'action (Utilisateur par défaut)
-      action: ActionType.CREATION, // Utilisation de l'enum ActionType
-      dateAction: new Date(), // Date et heure de l'action
-    },
-  });
+  let historique;
+
+  if (existingHistorique) {
+    historique = existingHistorique; // Si l'historique existe déjà, on l'assigne
+  } else {
+    historique = await prisma.historique.create({
+      data: {
+        taskId: task.id,
+        utilisateurId: user1.id,
+        action: ActionType.CREATION,
+        dateAction: new Date(),
+      },
+    });
+  }
 
   console.log("Données insérées avec succès!");
 }

@@ -60,4 +60,5 @@ model Historique {
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
   action        ActionType
   dateAction    DateTime    @default(now())
+
 }
