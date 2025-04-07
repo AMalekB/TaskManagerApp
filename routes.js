@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   getAllTasks,
   addTask,
@@ -7,6 +8,9 @@ import {
   deleteTask,
   getTaskHistory,
 } from "./model/appManager.js";
+
+import { addUser } from "./model/user.js";
+
 import {
   validateTaskData,
   validateStatus,
@@ -14,6 +18,95 @@ import {
 } from "./validation.js";
 
 const router = Router();
+
+//Definition des routes
+
+//Route pour la connexion
+router.post("/connexion", (request, response, next) => {
+  // On vérifie si le courriel et le mot de passe envoyés sont valides
+  if (
+    isEmailValid(request.body.email) &&
+    isPasswordValid(request.body.password)
+  ) {
+    // On lance l'authentification avec passport.js
+    passport.authenticate("local", (erreur, user, info) => {
+      if (erreur) {
+        // S'il y a une erreur, on la passe
+        // au serveur
+        next(erreur);
+      } else if (!user) {
+        // Si la connexion échoue, on envoit
+        // l'information au client avec un code
+        // 401 (Unauthorized)
+        response.status(401).json(info);
+      } else {
+        // Si tout fonctionne, on ajoute
+        // l'utilisateur dans la session et
+        // on retourne un code 200 (OK)
+        request.logIn(user, (erreur) => {
+          if (erreur) {
+            next(erreur);
+          }
+          // On ajoute l'utilisateur dans la session
+          if (!request.session.user) {
+            request.session.user = user;
+          }
+          response.status(200).json({
+            message: "Connexion réussie",
+            user,
+          });
+        });
+      }
+    })(request, response, next);
+  } else {
+    response.status(400).json({
+      error: "Email ou mot de passe invalide",
+    });
+  }
+});
+
+//Route deconnexion
+router.post("/deconnexion", (request, response) => {
+  //Protection de la route
+  if (!request.session.user) {
+    response.status(401).end();
+    return;
+  }
+  // Déconnecter l'utilisateur
+  request.logOut((erreur) => {
+    if (erreur) {
+      next(erreur);
+    }
+    // Rediriger l'utilisateur vers une autre page
+    response.redirect("/");
+  });
+});
+
+//Route pour ajouter un utilisateur
+router.post("/inscription", async (request, response) => {
+  const { email, password, nom } = request.body;
+  try {
+    const user = await addUser(nom, email, password);
+    response
+      .status(200)
+      .json({ user, message: "Utilisateur ajouté avec succès" });
+  } catch (error) {
+    console.log("error", error.code);
+    if (error.code === "P2002") {
+      response.status(409).json({ error: "Email déjà utilisé" });
+    } else {
+      response.status(400).json({ error: error.message });
+    }
+  }
+});
+
+router.get("/connexion", (request, response) => {
+  response.render("connexion", {
+    titre: "Connexion",
+    styles: ["css/style.css", "css/connexion.css"],
+    scripts: ["./js/connexion.js"],
+  });
+});
 
 // Route principale - rendu avec Handlebars
 router.get("/", async (request, response) => {
