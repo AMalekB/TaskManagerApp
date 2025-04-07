@@ -113,3 +113,35 @@ export function validateTaskData(taskData) {
         errors: errors
     };
 }
+
+
+// verifier si l'email est valide
+export const isEmailValid = (email) => {
+    if (!email || typeof email !== "string") {
+        return { isValid: false, message: "L'email est requis." };
+    }
+    if (email.length < 5) {
+        return { isValid: false, message: "L'email doit contenir au moins 5 caractères." };
+    }
+    if (email.length > 50) {
+        return { isValid: false, message: "L'email ne peut pas dépasser 50 caractères." };
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return { isValid: false, message: "L'email n'est pas valide." };
+    }
+    return { isValid: true };
+};
+
+// verifier si le password est valide
+export const isPasswordValid = (password) => {
+    if (!password || typeof password !== "string") {
+        return { isValid: false, message: "Le mot de passe est requis." };
+    }
+    if (password.length < 8) {
+        return { isValid: false, message: "Le mot de passe doit contenir au moins 8 caractères." };
+    }
+    if (password.length > 16) {
+        return { isValid: false, message: "Le mot de passe ne peut pas dépasser 16 caractères." };
+    }
+    return { isValid: true };
+};

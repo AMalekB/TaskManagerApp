@@ -15,6 +15,8 @@ import {
   validateTaskData,
   validateStatus,
   validateUser,
+  isEmailValid,
+  isPasswordValid
 } from "./validation.js";
 
 const router = Router();
@@ -23,46 +25,46 @@ const router = Router();
 
 //Route pour la connexion
 router.post("/connexion", (request, response, next) => {
-  // On vérifie si le courriel et le mot de passe envoyés sont valides
-  if (
-    isEmailValid(request.body.email) &&
-    isPasswordValid(request.body.password)
-  ) {
-    // On lance l'authentification avec passport.js
-    passport.authenticate("local", (erreur, user, info) => {
-      if (erreur) {
-        // S'il y a une erreur, on la passe
-        // au serveur
-        next(erreur);
-      } else if (!user) {
-        // Si la connexion échoue, on envoit
-        // l'information au client avec un code
-        // 401 (Unauthorized)
-        response.status(401).json(info);
-      } else {
-        // Si tout fonctionne, on ajoute
-        // l'utilisateur dans la session et
-        // on retourne un code 200 (OK)
-        request.logIn(user, (erreur) => {
-          if (erreur) {
-            next(erreur);
-          }
-          // On ajoute l'utilisateur dans la session
-          if (!request.session.user) {
-            request.session.user = user;
-          }
-          response.status(200).json({
-            message: "Connexion réussie",
-            user,
-          });
-        });
-      }
-    })(request, response, next);
-  } else {
-    response.status(400).json({
-      error: "Email ou mot de passe invalide",
+ 
+  const emailValidation = isEmailValid(request.body.email);
+  const passwordValidation = isPasswordValid(request.body.password);
+
+  // Vérification des validations
+  if (!emailValidation.isValid || !passwordValidation.isValid) {
+    return response.status(400).json({
+      error: "Validation échouée",
+      details: {
+        email: emailValidation.message,
+        password: passwordValidation.message,
+      },
     });
   }
+
+  // Si les validations passent, on lance l'authentification
+  passport.authenticate("local", (erreur, user, info) => {
+    if (erreur) {
+      // S'il y a une erreur, on la passe au serveur
+      next(erreur);
+    } else if (!user) {
+      // Si la connexion échoue, on envoie l'information au client
+      response.status(401).json(info);
+    } else {
+      // Si tout fonctionne, on ajoute l'utilisateur dans la session
+      request.logIn(user, (erreur) => {
+        if (erreur) {
+          next(erreur);
+        }
+        if (!request.session.user) {
+          request.session.user = user;
+        }
+        response.status(200).json({
+          message: "Connexion réussie",
+          user,
+        });
+      });
+    }
+  })(request, response, next);
+  
 });
 
 //Route deconnexion
