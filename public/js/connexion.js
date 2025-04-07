@@ -5,9 +5,6 @@ let formConnexion = document.getElementById("form-connexion");
 formConnexion.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  // Les noms des variables doivent être les mêmes
-  // que celles spécifié dans les configuration de
-  // passport dans le fichier "authentification.js"
   const data = {
     email: inputCourriel.value,
     password: inputMotDePasse.value,
