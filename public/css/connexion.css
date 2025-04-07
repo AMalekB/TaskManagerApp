@@ -60,3 +60,23 @@ form label {
 #connexion_button:hover {
   color: #111;
 }
+
+ .erreur-message {
+  font-size: 0.9em;
+  color: red;
+  margin-top: 5px;
+  position: static; 
+}
+  
+
+label {
+  display: block;
+  position: relative; 
+  margin-bottom: 20px; 
+}
+
+
+input {
+  display: block;
+  width: 400px; 
+  box-sizing: border-box; } 

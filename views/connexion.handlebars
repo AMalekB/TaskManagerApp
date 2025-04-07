@@ -1,22 +1,18 @@
 <section>
-
   <h2 id="connexion_h2">Connexion</h2>
 
-  <form id="form-connexion" class="form-authentification">
-    <label for="input-courriel">Courriel<input
-        type="email"
-        id="input-courriel"
-      /></label>
+  <form id="form-connexion" class="form-authentification" novalidate>
+    <label for="input-courriel">Courriel
+      <input type="email" id="input-courriel" />
+      <span id="courriel-erreur" class="erreur-message" ></span>
+    </label>
 
-    <label for="input-mot-de-passe">Mot de passe<input
-        type="password"
-        id="input-mot-de-passe"
-      /></label>
+    <label for="input-mot-de-passe">Mot de passe
+      <input type="password" id="input-mot-de-passe" />
+      <span id="mot-de-passe-erreur" class="erreur-message" ></span>
+    </label>
 
-    <button
-      type="submit"
-      value="Connexion"
-      id="connexion_button"
-    >Connexion</button>
+    <button type="submit" value="Connexion" id="connexion_button">Connexion</button>
   </form>
 </section>
+<script src="/js/connexion.js"></script>
