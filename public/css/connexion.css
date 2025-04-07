@@ -1,0 +1,62 @@
+.form-authentification {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.form-authentification label {
+  display: flex;
+  flex-direction: column;
+}
+
+#connexion_h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: beige;
+}
+
+form label {
+  color: beige;
+}
+
+/* From Uiverse.io by nikk7007 */
+#connexion_button {
+  padding: 0.8em 1.8em;
+  margin-top: 0.8em;
+  border: 2px solid #ffbb05;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 10px;
+  transition: 0.3s;
+  z-index: 1;
+  font-family: inherit;
+  color: #ffbb05;
+}
+
+#connexion_button::before {
+  content: "";
+  width: 0;
+  height: 300%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: #ffbb05;
+  transition: 0.5s ease;
+  display: block;
+  z-index: -1;
+}
+
+#connexion_button:hover::before {
+  width: 105%;
+}
+
+#connexion_button:hover {
+  color: #111;
+}

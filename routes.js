@@ -22,7 +22,7 @@ router.get("/", async (request, response) => {
   }
   try {
     const ListeTaches = await getAllTasks();
-    response.render("home", {
+    response.render("connexion", {
       tasks: ListeTaches,
       title: "Task Manager - Accueil",
     });
