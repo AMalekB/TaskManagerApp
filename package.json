@@ -12,7 +12,7 @@
   "author": "Abdelmalek Bezri, Mamadou Lamine Sall, Saddem Chorfi, Taha Ait Bella",
   "license": "UNLICENSED",
   "dependencies": {
-    "@prisma/client": "^6.4.1",
+    "@prisma/client": "^6.5.0",
     "bcrypt": "^5.1.1",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
@@ -27,6 +27,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
-    "prisma": "^6.4.1"
+    "prisma": "^6.5.0"
   }
 }
