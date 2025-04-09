@@ -1,5 +1,7 @@
 // On importe le PrismaClient depuis la librairie Prisma
-import { PrismaClient, ActionType } from "@prisma/client";
+import pkg from "@prisma/client";
+const { PrismaClient, ActionType } = pkg;
+
 
 // Création d'une instance de PrismaClient pour interagir avec la base de données
 const prisma = new PrismaClient();

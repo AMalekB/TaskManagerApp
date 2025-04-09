@@ -81,7 +81,6 @@ function getPriorityId(priorityText) {
       return "1";
     case "Moyenne":
       return "2";
-
     case "Faible":
       return "3";
     default:
@@ -95,9 +94,39 @@ function openAddTaskModal() {
   const modal = new bootstrap.Modal(document.getElementById("addTaskModal"));
   modal.show();
 }
-document
-  .querySelector(".btn-primary")
-  .addEventListener("click", openAddTaskModal);
+
+// Initialiser les écouteurs d'événements seulement si nous sommes sur la page des tâches
+document.addEventListener('DOMContentLoaded', () => {
+  const addTaskButton = document.querySelector(".btn-primary");
+  if (addTaskButton) {
+    addTaskButton.addEventListener("click", openAddTaskModal);
+  }
+
+  // Charger les tâches existantes seulement si nous sommes sur la page des tâches
+  const taskList = document.getElementById("taskList");
+  if (taskList) {
+    loadExistingTasks();
+  }
+
+  // Ajouter les écouteurs d'événements pour les boutons de tâche
+  const deleteButtons = document.querySelectorAll(".delete-task-button");
+  if (deleteButtons) {
+    deleteButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const taskElement = button.closest(".task");
+        if (taskElement) {
+          deleteTask(taskElement);
+        }
+      });
+    });
+  }
+
+  // Ajouter l'écouteur pour le bouton de sauvegarde d'édition
+  const saveEditButton = document.getElementById("saveEditButton");
+  if (saveEditButton) {
+    saveEditButton.addEventListener("click", saveEditedTask);
+  }
+});
 
 // Fonction pour ouvrir la modale des détails
 function openTaskDetailsModal(task) {
@@ -377,13 +406,6 @@ async function deleteTask(task) {
   }
 }
 
-document.querySelectorAll(".delete-task-button").forEach((button) => {
-  button.addEventListener("click", () => {
-    const taskElement = button.closest(".task"); // Assurez-vous que cette sélection correspond à votre structure HTML
-    deleteTask(taskElement);
-  });
-});
-
 // Modifier la fonction saveEditedTask
 async function saveEditedTask() {
   if (!currentTask) {
@@ -508,10 +530,6 @@ async function saveEditedTask() {
   }
 }
 
-document
-  .getElementById("saveEditButton")
-  .addEventListener("click", saveEditedTask);
-
 // Créer un élément de tâche avec boutons Modifier et Supprimer
 function createTaskElement(title, description, priority, dueDate) {
   const template = document.getElementById("taskTemplate");
@@ -538,8 +556,6 @@ function createTaskElement(title, description, priority, dueDate) {
     // Insérer la priorité après la description courte (sur la même ligne)
     shortDescriptionElement.insertAdjacentText("afterend", " "); // Ajouter un espace si nécessaire
     shortDescriptionElement.insertAdjacentElement("afterend", priorityElement);
-
-    // Supprimer l'ancienne insertion de la priorité et le <br> dans le template n'est plus nécessaire ici
 
     // Insérer la description après le titre
     titleElement.insertAdjacentElement("afterend", shortDescriptionElement);
