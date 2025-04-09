@@ -38,14 +38,21 @@ app.set("views", "./views"); //Pour informer express ou se trouvent les vues
 // Ajout de middlewares
 app.use(helmet(cspOption));
 app.use(compression());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5005',
+  credentials: true
+}));
 app.use(json());
 
 //middleware pour la session
 app.use(
   session({
-    cookie: { maxAge: 3600000 },
-    name: process.env.npm_package_name,
+    cookie: { 
+      maxAge: 3600000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    },
+    name: 'sessionId',
     store: new MemoryStore({ checkPeriod: 3600000 }),
     resave: false,
     saveUninitialized: false,
@@ -63,6 +70,15 @@ app.use(express.static("public"));
 
 // Ajout des routes
 app.use(routerExterne);
+
+// Middleware de gestion des erreurs
+app.use((err, req, res, next) => {
+  console.error("Erreur serveur:", err);
+  res.status(500).json({
+    error: "Une erreur est survenue sur le serveur",
+    details: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
 
 // Renvoyer une erreur 404 pour les routes non définies
 app.use((request, response) => {

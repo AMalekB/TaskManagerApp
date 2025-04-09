@@ -1,0 +1,37 @@
+<section>
+  <h2 id="inscription_h2">Inscription</h2>
+
+  <form id="form-inscription" class="form-authentification" novalidate>
+    <label for="input-nom">Nom
+      <input type="text" id="input-nom" required /> 
+      <span id="nom-erreur" class="erreur-message"></span>
+    </label>
+
+    <label for="input-prenom">Prénom
+      <input type="text" id="input-prenom" required />
+      <span id="prenom-erreur" class="erreur-message"></span>
+    </label>
+
+    <label for="input-courriel">Courriel
+      <input type="email" id="input-courriel" required />
+      <span id="courriel-erreur" class="erreur-message"></span>
+    </label>
+
+    <label for="input-mot-de-passe">Mot de passe
+      <input type="password" id="input-mot-de-passe" required />
+      <span id="mot-de-passe-erreur" class="erreur-message"></span>
+    </label>
+
+    <label for="input-confirmation-mot-de-passe">Confirmation du mot de passe
+      <input type="password" id="input-confirmation-mot-de-passe" required />
+      <span id="confirmation-mot-de-passe-erreur" class="erreur-message"></span>
+    </label>
+
+    <div class="auth-links">
+      <p>Déjà un compte ? <a href="/connexion">Se connecter</a></p>
+    </div>
+
+    <button type="submit" id="inscription_button">S'inscrire</button>
+  </form>
+</section>
+<script src="/js/inscription.js"></script> 

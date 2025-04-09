@@ -11,7 +11,7 @@
   flex-direction: column;
 }
 
-#connexion_h2 {
+#connexion_h2, #inscription_h2 {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,6 +23,81 @@ form label {
 }
 
 /* From Uiverse.io by nikk7007 */
+#connexion_button, #inscription_button {
+  padding: 0.8em 1.8em;
+  margin-top: 0.8em;
+  border: 2px solid #ffbb05;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 10px;
+  transition: 0.3s;
+  z-index: 1;
+  font-family: inherit;
+  color: #ffbb05;
+}
+
+#connexion_button::before, #inscription_button::before {
+  content: "";
+  width: 0;
+  height: 300%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: #ffbb05;
+  transition: 0.5s ease;
+  display: block;
+  z-index: -1;
+}
+
+#connexion_button:hover::before, #inscription_button:hover::before {
+  width: 105%;
+}
+
+#connexion_button:hover, #inscription_button:hover {
+  color: #111;
+}
+
+.erreur-message {
+  font-size: 0.9em;
+  color: red;
+  margin-top: 5px;
+  position: static; 
+}
+
+label { 
+  display: block;
+  position: relative; 
+  margin-bottom: 20px; 
+}
+
+input {
+  display: block;
+  width: 400px; 
+  box-sizing: border-box;
+}
+
+/* Styles pour les liens de connexion et d'inscription */
+.auth-links {
+  text-align: center;
+  margin: 1rem 0;
+  color: beige;
+}
+
+.auth-links a {
+  color: #ffbb05;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.auth-links a:hover {
+  color: #ffd700;
+  text-decoration: underline;
+}
+
 #connexion_button {
   padding: 0.8em 1.8em;
   margin-top: 0.8em;
@@ -61,7 +136,7 @@ form label {
   color: #111;
 }
 
- .erreur-message {
+.erreur-message {
   font-size: 0.9em;
   color: red;
   margin-top: 5px;
