@@ -217,21 +217,11 @@ router.get("/inscription", (request, response) => {
 
 // Route principale - rendu avec Handlebars
 router.get("/", async (request, response) => {
-  if (!request.session.id_user) {
-    request.session.id_user = 123;
-  }
-  try {
-    const ListeTaches = await getAllTasks();
-    response.render("connexion", {
-      tasks: ListeTaches,
-      title: "Task Manager - Accueil",
-    });
-  } catch (error) {
-    response.status(500).render("error", {
-      message: "Erreur lors du chargement des tâches",
-      error: error.message,
-    });
-  }
+  response.render("welcome", {
+    titre: "Bienvenue sur TaskManager",
+    styles: ["css/style.css", "css/welcome.css"],
+    scripts: ["./js/welcome.js"],
+  });
 });
 
 // Ajouter une tâche

@@ -1,0 +1,92 @@
+.welcome-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 2rem;
+  max-width: 800px;
+}
+
+#welcome_h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: beige;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-message {
+  color: beige;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.welcome-actions {
+  margin-top: 2rem;
+}
+
+#welcome_button {
+  padding: 1em 2.5em;
+  border: 2px solid #ffbb05;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 14px;
+  transition: 0.3s;
+  z-index: 1;
+  font-family: inherit;
+  color: #ffbb05;
+  text-decoration: none;
+  display: inline-block;
+}
+
+#welcome_button::before {
+  content: "";
+  width: 0;
+  height: 300%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: #ffbb05;
+  transition: 0.5s ease;
+  display: block;
+  z-index: -1;
+}
+
+#welcome_button:hover::before {
+  width: 105%;
+}
+
+#welcome_button:hover {
+  color: #111;
+}
+
+/* Réutilisation des styles pour les liens */
+.auth-links {
+  text-align: center;
+  margin: 1rem 0;
+  color: beige;
+}
+
+.auth-links a {
+  color: #ffbb05;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.auth-links a:hover {
+  color: #ffd700;
+  text-decoration: underline;
+} 
