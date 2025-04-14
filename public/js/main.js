@@ -1,5 +1,5 @@
 // Définir l'URL de base de l'API
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://localhost:5000/api";
 
 // Importer les fonctions de validation
 import {
@@ -96,7 +96,7 @@ function openAddTaskModal() {
 }
 
 // Initialiser les écouteurs d'événements seulement si nous sommes sur la page des tâches
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const addTaskButton = document.querySelector(".btn-primary");
   if (addTaskButton) {
     addTaskButton.addEventListener("click", openAddTaskModal);
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Ajouter les écouteurs d'événements pour les boutons de tâche
   const deleteButtons = document.querySelectorAll(".delete-task-button");
   if (deleteButtons) {
-    deleteButtons.forEach(button => {
+    deleteButtons.forEach((button) => {
       button.addEventListener("click", () => {
         const taskElement = button.closest(".task");
         if (taskElement) {
@@ -342,6 +342,7 @@ async function addTask() {
     });
 
     const data = await response.json();
+    console.log("Réponse de l'API:", data);
 
     if (!response.ok) {
       throw new Error(
@@ -349,13 +350,31 @@ async function addTask() {
       );
     }
 
-    console.log("Tâche ajoutée :", data);
+    if (!data.NouvelleTache?.id) {
+      throw new Error(
+        "L'ID de la tâche est manquant dans la réponse du serveur"
+      );
+    }
 
-    // Créer l'élément de la tâche avec les données retournées par le serveur
-    const task = createTaskElement(title, description, priority, dueDate);
+    // Correction cruciale : Vérification du template
+    const template = document.getElementById("taskTemplate");
+    if (!template) {
+      throw new Error("Le template de tâche est introuvable dans le DOM");
+    }
+
+    // Utilisation des données du serveur
+    const task = createTaskElement(
+      data.NouvelleTache.titre,
+      data.NouvelleTache.description,
+      data.NouvelleTache.prioriteId,
+      data.NouvelleTache.dateLimite
+    );
+
+    if (!task) {
+      throw new Error("Échec de la création de l'élément de tâche");
+    }
+
     task.setAttribute("data-id", data.NouvelleTache.id);
-
-    // Ajouter la tâche dans la colonne "À faire"
     document.getElementById("todo").appendChild(task);
 
     closeModal("addTaskModal");
@@ -532,79 +551,33 @@ async function saveEditedTask() {
 
 // Créer un élément de tâche avec boutons Modifier et Supprimer
 function createTaskElement(title, description, priority, dueDate) {
-  const template = document.getElementById("taskTemplate");
-  const task = template.content.cloneNode(true);
-  const taskContainer = document.createElement("div");
-
-  const taskContent = task.querySelector(".border");
-  if (taskContent) {
-    const titleElement = taskContent.querySelector("h6");
-    titleElement.textContent = title;
-
-    // Élément pour la description courte dans la liste
-    const shortDescriptionElement = document.createElement("p");
-    shortDescriptionElement.className = "task-description-short";
-    shortDescriptionElement.textContent = description;
-
-    const priorityElement = taskContent.querySelector(".task-priority");
-    const priorityText = getPriorityText(priority);
-    priorityElement.textContent = "Priorité: " + priorityText;
-
-    const dueDateElement = taskContent.querySelector(".task-due-date");
-    dueDateElement.textContent = "Date limite: " + dueDate;
-
-    // Insérer la priorité après la description courte (sur la même ligne)
-    shortDescriptionElement.insertAdjacentText("afterend", " "); // Ajouter un espace si nécessaire
-    shortDescriptionElement.insertAdjacentElement("afterend", priorityElement);
-
-    // Insérer la description après le titre
-    titleElement.insertAdjacentElement("afterend", shortDescriptionElement);
-
-    // Stocker la description complète comme attribut de données
-    taskContainer.dataset.fullDescription = description;
-
-    const taskStatusSelect = taskContent.querySelector("#taskStatus");
-    const parentColumn = taskContainer.parentElement;
-    if (parentColumn) {
-      taskStatusSelect.value = parentColumn.id;
-    }
-    taskStatusSelect.addEventListener("change", function (event) {
-      changeStatus(event, taskContainer);
-    });
-
-    const editButton = taskContent.querySelector(".btn-warning");
-    editButton.addEventListener("click", function () {
-      openEditTaskModal(taskContainer);
-    });
-
-    const deleteButton = taskContent.querySelector(".btn-danger");
-    deleteButton.addEventListener("click", function () {
-      deleteTask(taskContainer);
-    });
-
-    const detailsButton = taskContent.querySelector(".btn-success");
-    detailsButton.addEventListener("click", function () {
-      openTaskDetailsModal(taskContainer);
-    });
-
-    const buttonContainer = taskContent.querySelector(".d-flex"); // Sélectionner le conteneur existant
-    // Assurez-vous que le conteneur existe dans votre template, sinon créez-le comme avant
-    if (!buttonContainer) {
-      const newButtonContainer = document.createElement("div");
-      newButtonContainer.className = "d-flex gap-2 mt-2";
-      newButtonContainer.appendChild(editButton);
-      newButtonContainer.appendChild(deleteButton);
-      newButtonContainer.appendChild(detailsButton);
-      taskContent.appendChild(newButtonContainer);
-    } else {
-      // Si le conteneur existe, les boutons devraient déjà y être (selon votre template)
+  try {
+    const template = document.getElementById("taskTemplate");
+    if (!template) {
+      throw new Error("Template 'taskTemplate' non trouvé");
     }
 
-    taskContainer.appendChild(taskContent);
+    const clone = template.content.cloneNode(true);
+    const taskElement = clone.querySelector(".border.bg-white.rounded");
+
+    // Remplissage des données
+    taskElement.querySelector("h6").textContent = title;
+    taskElement.querySelector(".task-description-short").textContent =
+      description;
+    taskElement.querySelector(
+      ".task-priority"
+    ).textContent = `Priorité: ${getPriorityText(priority)}`;
+    taskElement.querySelector(".task-due-date").textContent = new Date(
+      dueDate
+    ).toLocaleDateString("fr-FR");
+
+    return taskElement;
+  } catch (error) {
+    console.error("Erreur dans createTaskElement:", error);
+    return null;
   }
-
-  return taskContainer;
 }
+
 // Changer le statut de la tâche
 async function changeStatus(event, taskContainer) {
   const taskStatus = event.target.value;
