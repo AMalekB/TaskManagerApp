@@ -1,5 +1,4 @@
-import passport from 'passport';
-
+import passport from "passport";
 
 import { Router } from "express";
 import crypto from "crypto";
@@ -20,7 +19,7 @@ import {
   validateStatus,
   validateUser,
   isEmailValid,
-  isPasswordValid
+  isPasswordValid,
 } from "./validation.js";
 
 const router = Router();
@@ -36,64 +35,112 @@ router.use((req, res, next) => {
 //Definition des routes
 
 //Route pour la connexion
-router.post("/connexion", async (req, res) => {
+router.post("/connexion", (request, response, next) => {
+  // On vérifie le le courriel et le mot de passe
+  // envoyé sont valides
+  if (
+    isEmailValid(request.body.email) &&
+    isPasswordValid(request.body.password)
+  ) {
+    // On lance l'authentification avec passport.js
+    passport.authenticate("local", (erreur, user, info) => {
+      if (erreur) {
+        // S'il y a une erreur, on la passe
+        // au serveur
+        next(erreur);
+      } else if (!user) {
+        // Si la connexion échoue, on envoit
+        // l'information au client avec un code
+        // 401 (Unauthorized)
+        response.status(401).json(info);
+      } else {
+        // Si tout fonctionne, on ajoute
+        // l'utilisateur dans la session et
+        // on retourne un code 200 (OK)
+        request.logIn(user, (erreur) => {
+          if (erreur) {
+            next(erreur);
+          }
+          // On ajoute l'utilisateur dans la session
+          if (!request.session.user) {
+            request.session.user = user;
+          }
+          response.status(200).json({
+            message: "Connexion réussie",
+            user,
+            redirectUrl: "/inscription",
+          });
+        });
+      }
+    })(request, response, next);
+  } else {
+    response.status(400).json({
+      error: "Email ou mot de passe invalide",
+    });
+  }
+});
+
+/* router.post("/connexion", async (req, res) => {
   try {
-    console.log('Tentative de connexion avec:', { email: req.body.email });
-    
+    console.log("Tentative de connexion avec:", { email: req.body.email });
+
     const { email, password } = req.body;
 
     // Validation des champs requis
     if (!email || !password) {
-      console.log('Champs manquants:', { email: !!email, password: !!password });
+      console.log("Champs manquants:", {
+        email: !!email,
+        password: !!password,
+      });
       return res.status(400).json({
-        error: 'Email et mot de passe requis'
+        error: "Email et mot de passe requis",
       });
     }
 
     // Utilisation de Passport pour l'authentification
-    passport.authenticate('local', (err, user, info) => {
+    passport.authenticate("local", (err, user, info) => {
       if (err) {
-        console.error('Erreur d\'authentification:', err);
+        console.error("Erreur d'authentification:", err);
         return res.status(500).json({
-          error: 'Erreur lors de l\'authentification'
+          error: "Erreur lors de l'authentification",
         });
       }
 
       if (!user) {
-        console.log('Authentification échouée:', info);
+        console.log("Authentification échouée:", info);
         return res.status(401).json({
-          error: info.message || 'Email ou mot de passe incorrect'
+          error: info.message || "Email ou mot de passe incorrect",
         });
       }
 
       // Connexion réussie
       req.logIn(user, (err) => {
         if (err) {
-          console.error('Erreur lors de la création de la session:', err);
+          console.error("Erreur lors de la création de la session:", err);
           return res.status(500).json({
-            error: 'Erreur lors de la création de la session'
+            error: "Erreur lors de la création de la session",
           });
         }
 
-        console.log('Connexion réussie pour:', user.email);
+        console.log("Connexion réussie pour:", user.email);
         return res.status(200).json({
-          message: 'Connexion réussie',
+          message: "Connexion réussie",
           user: {
             id: user.id,
             email: user.email,
             nom: user.nom,
-            prenom: user.prenom
-          }
+            prenom: user.prenom,
+          },
         });
       });
     })(req, res);
   } catch (error) {
-    console.error('Erreur serveur lors de la connexion:', error);
+    console.error("Erreur serveur lors de la connexion:", error);
     res.status(500).json({
-      error: 'Une erreur est survenue lors de la connexion'
+      error: "Une erreur est survenue lors de la connexion",
     });
   }
-});
+}); */
 
 // Middleware pour vérifier si l'utilisateur est connecté
 const isAuthenticated = (req, res, next) => {
@@ -111,9 +158,11 @@ router.post("/deconnexion", isAuthenticated, (req, res) => {
     }
     req.session.destroy((err) => {
       if (err) {
-        return res.status(500).json({ error: "Erreur lors de la destruction de la session" });
+        return res
+          .status(500)
+          .json({ error: "Erreur lors de la destruction de la session" });
       }
-      res.clearCookie('connect.sid');
+      res.clearCookie("connect.sid");
       res.json({ message: "Déconnexion réussie" });
     });
   });
@@ -132,8 +181,8 @@ router.post("/inscription", async (request, response) => {
           nom: !nom ? "Le nom est requis" : null,
           prenom: !prenom ? "Le prénom est requis" : null,
           email: !email ? "L'email est requis" : null,
-          password: !password ? "Le mot de passe est requis" : null
-        }
+          password: !password ? "Le mot de passe est requis" : null,
+        },
       });
     }
 
@@ -145,8 +194,8 @@ router.post("/inscription", async (request, response) => {
         error: "Validation échouée",
         details: {
           email: emailValidation.message,
-          password: passwordValidation.message
-        }
+          password: passwordValidation.message,
+        },
       });
     }
 
@@ -155,7 +204,7 @@ router.post("/inscription", async (request, response) => {
       nom,
       prenom,
       email,
-      password
+      password,
     });
 
     // Redirection vers la page de connexion
@@ -165,18 +214,18 @@ router.post("/inscription", async (request, response) => {
         id: user.id,
         nom: user.nom,
         prenom: user.prenom,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
   } catch (error) {
     console.error("Erreur lors de l'inscription:", error);
-    
+
     if (error.message === "Email déjà utilisé") {
       return response.status(409).json({
         error: "Email déjà utilisé",
         details: {
-          email: "Cet email est déjà utilisé par un autre compte"
-        }
+          email: "Cet email est déjà utilisé par un autre compte",
+        },
       });
     }
 
@@ -185,15 +234,16 @@ router.post("/inscription", async (request, response) => {
       return response.status(409).json({
         error: "Email déjà utilisé",
         details: {
-          email: "Cet email est déjà utilisé par un autre compte"
-        }
+          email: "Cet email est déjà utilisé par un autre compte",
+        },
       });
     }
 
     // Autres erreurs
     response.status(500).json({
       error: "Une erreur est survenue lors de l'inscription",
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 });
@@ -398,14 +448,14 @@ router.post("/reset-password", async (request, response) => {
 
     if (!email) {
       return response.status(400).json({
-        error: "L'adresse email est requise"
+        error: "L'adresse email est requise",
       });
     }
 
     const emailValidation = isEmailValid(email);
     if (!emailValidation.isValid) {
       return response.status(400).json({
-        error: emailValidation.message
+        error: emailValidation.message,
       });
     }
 
@@ -415,12 +465,13 @@ router.post("/reset-password", async (request, response) => {
       // Pour des raisons de sécurité, on renvoie toujours un succès
       // même si l'email n'existe pas
       return response.status(200).json({
-        message: "Si l'email existe dans notre base de données, vous recevrez un lien de réinitialisation"
+        message:
+          "Si l'email existe dans notre base de données, vous recevrez un lien de réinitialisation",
       });
     }
 
     // Générer un token de réinitialisation
-    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetToken = crypto.randomBytes(32).toString("hex");
     const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 heure
 
     // Sauvegarder le token dans la base de données
@@ -428,20 +479,22 @@ router.post("/reset-password", async (request, response) => {
       where: { email },
       data: {
         resetToken,
-        resetTokenExpiry
-      }
+        resetTokenExpiry,
+      },
     });
 
     // Envoyer l'email avec le lien de réinitialisation
     // TODO: Implémenter l'envoi d'email
     // Pour l'instant, on renvoie juste un succès
     response.status(200).json({
-      message: "Si l'email existe dans notre base de données, vous recevrez un lien de réinitialisation"
+      message:
+        "Si l'email existe dans notre base de données, vous recevrez un lien de réinitialisation",
     });
   } catch (error) {
     console.error("Erreur lors de la réinitialisation du mot de passe:", error);
     response.status(500).json({
-      error: "Une erreur est survenue lors de la réinitialisation du mot de passe"
+      error:
+        "Une erreur est survenue lors de la réinitialisation du mot de passe",
     });
   }
 });
@@ -451,15 +504,15 @@ router.get("/test-session", (req, res) => {
   console.log("Test de session - Session ID:", req.sessionID);
   console.log("Test de session - Session:", req.session);
   console.log("Test de session - User:", req.user);
-  
+
   if (req.session.user) {
     res.json({
       message: "Session active",
-      user: req.session.user
+      user: req.session.user,
     });
   } else {
     res.status(401).json({
-      message: "Aucune session active"
+      message: "Aucune session active",
     });
   }
 });
