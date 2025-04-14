@@ -109,17 +109,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Ajouter les écouteurs d'événements pour les boutons de tâche
-  const deleteButtons = document.querySelectorAll(".delete-task-button");
-  if (deleteButtons) {
-    deleteButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        const taskElement = button.closest(".task");
-        if (taskElement) {
-          deleteTask(taskElement);
-        }
-      });
-    });
-  }
+  document.addEventListener("click", (event) => {
+    if (event.target.closest(".delete-task-button")) {
+      const taskElement = event.target.closest(".task");
+      if (taskElement) deleteTask(taskElement);
+    }
+  });
 
   // Ajouter l'écouteur pour le bouton de sauvegarde d'édition
   const saveEditButton = document.getElementById("saveEditButton");
