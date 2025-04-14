@@ -17,7 +17,10 @@ export const getUserByEmail = async (email) => {
     });
     return user;
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'utilisateur par email:", error);
+    console.error(
+      "Erreur lors de la récupération de l'utilisateur par email:",
+      error
+    );
     throw error;
   }
 };
@@ -32,7 +35,10 @@ export const getUserById = async (id) => {
     });
     return user;
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'utilisateur par ID:", error);
+    console.error(
+      "Erreur lors de la récupération de l'utilisateur par ID:",
+      error
+    );
     throw error;
   }
 };

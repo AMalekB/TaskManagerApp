@@ -42,21 +42,23 @@ app.set("views", "./views"); //Pour informer express ou se trouvent les vues
 // Ajout de middlewares
 app.use(helmet(cspOption));
 app.use(compression());
-app.use(cors({
-  origin: 'http://localhost:5005',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5005",
+    credentials: true,
+  })
+);
 app.use(json());
 
 //middleware pour la session
 app.use(
   session({
-    cookie: { 
+    cookie: {
       maxAge: 3600000,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     },
-    name: 'sessionId',
+    name: process.env.npm_package_name,
     store: new MemoryStore({ checkPeriod: 3600000 }),
     resave: false,
     saveUninitialized: false,
@@ -80,7 +82,7 @@ app.use((err, req, res, next) => {
   console.error("Erreur serveur:", err);
   res.status(500).json({
     error: "Une erreur est survenue sur le serveur",
-    details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    details: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
 
