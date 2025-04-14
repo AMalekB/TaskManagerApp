@@ -291,6 +291,7 @@ router.post("/api/task", async (request, response) => {
       .status(200)
       .json({ NouvelleTache, message: "Tâche ajoutée avec succès" });
   } catch (error) {
+    console.error("Erreur:", error); // Ajout d'un log d'erreur
     response.status(400).json({ error: error.message });
   }
 });
