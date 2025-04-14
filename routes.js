@@ -295,6 +295,24 @@ router.post("/api/task", async (request, response) => {
   }
 });
 
+// Route home
+router.get("/home", async (request, response) => {
+  if (!request.session.id_user) {
+    request.session.id_user = 123;
+  }
+  try {
+    const ListeTaches = await getAllTasks();
+    response.render("home", {
+      tasks: ListeTaches,
+      title: "Task Manager - Home",
+    });
+  } catch (error) {
+    response.status(500).render("error", {
+      message: "Erreur lors du chargement des tâches",
+      error: error.message,
+    });
+  }
+});
 // Récupérer toutes les tâches
 router.get("/api/tasks", async (request, response) => {
   try {

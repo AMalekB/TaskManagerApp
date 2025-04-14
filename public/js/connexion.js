@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.ok) {
         // Redirection vers la page d'accueil en cas de succès
-        window.location.href = "/api/tasks";
+        window.location.href = "/home";
       } else {
         // Gestion des erreurs
         if (data.details) {
