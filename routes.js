@@ -68,7 +68,6 @@ router.post("/connexion", (request, response, next) => {
           response.status(200).json({
             message: "Connexion réussie",
             user,
-            redirectUrl: "/inscription",
           });
         });
       }

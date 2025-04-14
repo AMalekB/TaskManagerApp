@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const formConnexion = document.getElementById("form-connexion");
   const inputCourriel = document.getElementById("input-courriel");
   const inputMotDePasse = document.getElementById("input-mot-de-passe");
@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
       motDePasseErreur.textContent = "Le mot de passe est requis";
       isValid = false;
     } else if (!validatePassword(inputMotDePasse.value)) {
-      motDePasseErreur.textContent = "Le mot de passe doit contenir au moins 8 caractères";
+      motDePasseErreur.textContent =
+        "Le mot de passe doit contenir au moins 8 caractères";
       isValid = false;
     }
 
@@ -57,15 +58,15 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: inputCourriel.value.trim(),
-          password: inputMotDePasse.value
-        })
+          password: inputMotDePasse.value,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         // Redirection vers la page d'accueil en cas de succès
-        window.location.href = "/";
+        window.location.href = "/api/tasks";
       } else {
         // Gestion des erreurs
         if (data.details) {
@@ -84,7 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
-      alert("Une erreur est survenue lors de la connexion. Veuillez réessayer.");
+      alert(
+        "Une erreur est survenue lors de la connexion. Veuillez réessayer."
+      );
     } finally {
       // Réactiver le bouton et restaurer le texte
       submitButton.disabled = false;
@@ -107,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!inputMotDePasse.value) {
       motDePasseErreur.textContent = "Le mot de passe est requis";
     } else if (!validatePassword(inputMotDePasse.value)) {
-      motDePasseErreur.textContent = "Le mot de passe doit contenir au moins 8 caractères";
+      motDePasseErreur.textContent =
+        "Le mot de passe doit contenir au moins 8 caractères";
     } else {
       motDePasseErreur.textContent = "";
     }
