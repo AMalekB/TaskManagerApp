@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
+        sessionStorage.setItem("currentUser", JSON.stringify(data.user)); // Stockage
         // Redirection vers la page d'accueil en cas de succès
         window.location.href = "/home";
       } else {

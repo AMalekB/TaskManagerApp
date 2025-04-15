@@ -366,12 +366,18 @@ async function addTask() {
   }
 
   try {
+    // Récupérer l'utilisateur connecté
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+    if (!currentUser?.id) {
+      throw new Error("Utilisateur non connecté");
+    }
+
     const taskData = {
       titre: title.trim(),
       description: description.trim(),
       prioriteId: parseInt(priority),
       statutId: 1,
-      utilisateurId: 1,
+      utilisateurId: currentUser.id,
       dateLimite: dueDate,
     };
 

@@ -67,7 +67,11 @@ router.post("/connexion", (request, response, next) => {
           }
           response.status(200).json({
             message: "Connexion réussie",
-            user,
+            user: {
+              id: user.id, // Ajouter l'ID
+              email: user.email,
+              role: user.role,
+            },
           });
         });
       }
