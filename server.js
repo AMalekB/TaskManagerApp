@@ -20,7 +20,7 @@ import { engine } from "express-handlebars";
 import session from "express-session";
 
 //Importation de la memorystore
-import memorystore from "memorystore"; 
+import memorystore from "memorystore";
 
 // Importation de passeport
 import passport from "passport";
@@ -55,8 +55,8 @@ app.use(
   session({
     cookie: {
       maxAge: 3600000,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: false,
+      sameSite: "strict",
     },
     name: process.env.npm_package_name,
     store: new MemoryStore({ checkPeriod: 3600000 }),
@@ -96,8 +96,8 @@ app.use((request, response) => {
 //Usage du HTTPS
 if (process.env.NODE_ENV === "development") {
   let credentials = {
-      key: await readFile("./security/localhost.key"),
-      cert: await readFile("./security/localhost.cert"),
+    key: await readFile("./security/localhost.key"),
+    cert: await readFile("./security/localhost.cert"),
   };
 
   https.createServer(credentials, app).listen(process.env.PORT);

@@ -136,6 +136,28 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  const logoutButton = document.getElementById("logout-button");
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+      try {
+        const response = await fetch("/deconnexion", {
+          method: "POST",
+          credentials: "same-origin", // Inclure les cookies de session
+        });
+
+        if (response.ok) {
+          // Rediriger vers la page "welcome"
+          window.location.href = "/";
+        } else {
+          alert("Erreur lors de la déconnexion.");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la déconnexion :", error);
+        alert("Une erreur est survenue lors de la déconnexion.");
+      }
+    });
+  }
 });
 
 // Fonction pour ouvrir la modale des détails
