@@ -150,6 +150,28 @@ const isAuthenticated = (req, res, next) => {
 };
 
 // Route pour la déconnexion
+/* router.post("/deconnexion", (request, response, next) => {
+  if (!request.isAuthenticated()) {
+    return response.status(401).json({ error: "Non autorisé" });
+  }
+
+  request.logOut((erreur) => {
+    if (erreur) {
+      return next(erreur);
+    }
+
+    request.session.destroy((err) => {
+      if (err) {
+        return response
+          .status(500)
+          .json({ error: "Erreur lors de la déconnexion" });
+      }
+      response.clearCookie(process.env.npm_package_name);
+      response.status(200).json({ message: "Déconnexion réussie" });
+    });
+  });
+}); */
+
 router.post("/deconnexion", isAuthenticated, (req, res) => {
   req.logout((err) => {
     if (err) {
