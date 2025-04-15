@@ -114,6 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const taskElement = event.target.closest(".task");
       if (taskElement) deleteTask(taskElement);
     }
+
+    if (event.target.closest(".btn-warning")) {
+      // Cible le bouton Modifier
+      const taskElement = event.target.closest(".task");
+      if (taskElement) openEditTaskModal(taskElement);
+    }
   });
 
   // Ajouter l'écouteur pour le bouton de sauvegarde d'édition
@@ -121,56 +127,85 @@ document.addEventListener("DOMContentLoaded", () => {
   if (saveEditButton) {
     saveEditButton.addEventListener("click", saveEditedTask);
   }
+
+  document.addEventListener("click", (event) => {
+    if (event.target.closest(".btn-success")) {
+      const taskElement = event.target.closest(".task");
+      if (taskElement) {
+        openTaskDetailsModal(taskElement);
+      }
+    }
+  });
 });
 
 // Fonction pour ouvrir la modale des détails
 function openTaskDetailsModal(task) {
   const taskId = task.getAttribute("data-id");
-  const fullDescription = task.dataset.fullDescription; // Récupérer la description complète
+  const fullDescription =
+    task.dataset.fullDescription || "Aucune description disponible";
 
   // Récupérer les détails de la tâche
-  document.getElementById("taskDetailTitle").innerText =
-    task.querySelector("h6").innerText;
-  document.getElementById("taskDetailDescription").innerText = fullDescription; // Afficher la description complète
-  document.getElementById("taskDetailPriority").innerText = task
-    .querySelector(".task-priority")
-    .innerText.split(": ")[1]
-    .trim();
-  document.getElementById("taskDetailDueDate").innerText = task
-    .querySelector(".task-due-date")
-    .innerText.split(": ")[1]
-    .trim();
+  const titleElement = document.getElementById("taskDetailTitle");
+  if (titleElement) {
+    titleElement.innerText =
+      task.querySelector("h6")?.innerText || "Titre non spécifié";
+  }
 
-  // Charger l'historique de la tâche (inchangé)
-  fetch(`http://localhost:5000/api/task/${taskId}/history`)
+  const descriptionElement = document.getElementById("taskDetailDescription");
+  if (descriptionElement) {
+    descriptionElement.innerText = fullDescription;
+  }
+
+  const priorityElement = task.querySelector(".task-priority");
+  const priorityText = priorityElement
+    ? priorityElement.innerText.split(": ")[1]?.trim()
+    : "Non spécifiée";
+  const priorityDetailElement = document.getElementById("taskDetailPriority");
+  if (priorityDetailElement) {
+    priorityDetailElement.innerText = priorityText;
+  }
+
+  const dueDateElement = task.querySelector(".task-due-date");
+  const dueDateText = dueDateElement
+    ? dueDateElement.innerText.split(": ")[1]?.trim()
+    : "Non spécifiée";
+  const dueDateDetailElement = document.getElementById("taskDetailDueDate");
+  if (dueDateDetailElement) {
+    dueDateDetailElement.innerText = dueDateText;
+  }
+
+  // Charger l'historique de la tâche
+  fetch(`https://localhost:5000/api/task/${taskId}/history`)
     .then((response) => response.json())
     .then((data) => {
       const historyList = document.getElementById("taskHistoryList");
-      historyList.innerHTML = "";
+      if (historyList) {
+        historyList.innerHTML = "";
 
-      if (data.historique && data.historique.length > 0) {
-        data.historique.forEach((entry) => {
-          const listItem = document.createElement("li");
-          listItem.className = "list-group-item";
-          listItem.innerHTML = `<strong>${
-            entry.utilisateur.nom
-          }</strong> - ${entry.action.toLowerCase()} (${new Date(
-            entry.dateAction
-          ).toLocaleString()})`;
-          historyList.appendChild(listItem);
-        });
-      } else {
-        const emptyItem = document.createElement("li");
-        emptyItem.className = "list-group-item text-muted";
-        emptyItem.innerText = "Aucune modification enregistrée.";
-        historyList.appendChild(emptyItem);
+        if (data.historique && data.historique.length > 0) {
+          data.historique.forEach((entry) => {
+            const listItem = document.createElement("li");
+            listItem.className = "list-group-item";
+            listItem.innerHTML = `<strong>${
+              entry.utilisateur.nom
+            }</strong> - ${entry.action.toLowerCase()} (${new Date(
+              entry.dateAction
+            ).toLocaleString()})`;
+            historyList.appendChild(listItem);
+          });
+        } else {
+          const emptyItem = document.createElement("li");
+          emptyItem.className = "list-group-item text-muted";
+          emptyItem.innerText = "Aucune modification enregistrée.";
+          historyList.appendChild(emptyItem);
+        }
       }
     })
     .catch((error) =>
       console.error("Erreur lors du chargement de l'historique :", error)
     );
 
-  // Ouvrir la modale (inchangé)
+  // Ouvrir la modale
   const modal = new bootstrap.Modal(
     document.getElementById("taskDetailsModal")
   );
@@ -180,6 +215,7 @@ function openTaskDetailsModal(task) {
 // Ouvrir la modale d'édition de tâche
 function openEditTaskModal(task) {
   currentTask = task;
+
   document.getElementById("editTaskTitle").value =
     task.querySelector("h6").innerText;
   document.getElementById("editTaskDescription").value =
@@ -545,7 +581,7 @@ async function saveEditedTask() {
 }
 
 // Créer un élément de tâche avec boutons Modifier et Supprimer
-function createTaskElement(title, description, priority, dueDate) {
+function createTaskElement(title, description, priority, dueDate, taskId) {
   try {
     const template = document.getElementById("taskTemplate");
     if (!template) {
@@ -553,22 +589,33 @@ function createTaskElement(title, description, priority, dueDate) {
     }
 
     const clone = template.content.cloneNode(true);
-    const taskElement = clone.querySelector(".border.bg-white.rounded");
+    const taskElement = clone.querySelector(".task");
 
     // Remplissage des données
-    taskElement.querySelector("h6").textContent = title;
+    taskElement.querySelector("h6").textContent = title || "Titre non spécifié";
     taskElement.querySelector(".task-description-short").textContent =
-      description;
-    taskElement.querySelector(
-      ".task-priority"
-    ).textContent = `Priorité: ${getPriorityText(priority)}`;
-    taskElement.querySelector(".task-due-date").textContent = new Date(
-      dueDate
-    ).toLocaleDateString("fr-FR");
+      description || "Description non spécifiée";
+    taskElement.querySelector(".task-priority").textContent = `Priorité: ${
+      getPriorityText(priority) || "Non spécifiée"
+    }`;
+    taskElement.querySelector(".task-due-date").textContent = dueDate
+      ? `Date limite: ${new Date(dueDate).toLocaleDateString("fr-FR")}`
+      : "Date limite: Non spécifiée";
+
+    // Ajout de l'attribut data-id
+    taskElement.setAttribute("data-id", taskId);
+
+    // Gestion du select pour le statut
+    const statusSelect = taskElement.querySelector("#taskStatus");
+    if (statusSelect) {
+      statusSelect.addEventListener("change", (event) =>
+        changeStatus(event, taskElement)
+      );
+    }
 
     return taskElement;
   } catch (error) {
-    console.error("Erreur dans createTaskElement:", error);
+    console.error("Erreur dans createTaskElement :", error);
     return null;
   }
 }
