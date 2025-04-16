@@ -484,6 +484,7 @@ async function deleteTask(task) {
   }
 }
 
+// Enregistrer les changements d'une tâche
 async function saveEditedTask() {
   if (!currentTask) {
     console.warn("Aucune tâche sélectionnée pour l'édition.");
@@ -711,10 +712,10 @@ async function changeStatus(event, taskContainer) {
         targetColumn = document.getElementById("todo");
         break;
       case "in-progress":
-        targetColumn = document.getElementById("inProgress");
+        targetColumn = document.getElementById("in-progress");
         break;
       case "in-review":
-        targetColumn = document.getElementById("inReview");
+        targetColumn = document.getElementById("in-review");
         break;
       case "done":
         targetColumn = document.getElementById("done");
@@ -724,9 +725,9 @@ async function changeStatus(event, taskContainer) {
     }
 
     // Déplacer la tâche
-    if (targetColumn) {
+    
       targetColumn.appendChild(taskDiv);
-    }
+    
 
     // Mettre à jour le select pour refléter le nouveau statut
     const statusSelect = taskDiv.querySelector("#taskStatus");
