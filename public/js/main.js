@@ -484,7 +484,6 @@ async function deleteTask(task) {
   }
 }
 
-// Modifier la fonction saveEditedTask
 async function saveEditedTask() {
   if (!currentTask) {
     console.warn("Aucune tâche sélectionnée pour l'édition.");
@@ -529,6 +528,12 @@ async function saveEditedTask() {
   }
 
   try {
+    // Récupérer l'utilisateur connecté depuis le sessionStorage
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+    if (!currentUser?.id) {
+      throw new Error("Vous devez être connecté pour modifier une tâche");
+    }
+
     // Récupérer le statut actuel de la tâche
     const statusSelect = currentTask.querySelector("#taskStatus");
     let currentStatus = 1; // Par défaut "À faire"
@@ -557,7 +562,7 @@ async function saveEditedTask() {
       prioriteId: parseInt(selectedPriority),
       statutId: currentStatus,
       dateLimite: new Date(dueDate).toISOString(),
-      utilisateurId: 1,
+      utilisateurId: currentUser.id, // Utilisation de l'ID de l'utilisateur connecté
     };
 
     // Validation complète des données
