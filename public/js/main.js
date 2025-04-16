@@ -674,6 +674,12 @@ async function changeStatus(event, taskContainer) {
   }
 
   try {
+    // Récupérer l'utilisateur connecté
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+    if (!currentUser?.id) {
+      throw new Error("Vous devez être connecté pour modifier le statut d'une tâche");
+    }
+
     // Mettre à jour le statut dans la base de données
     const response = await fetch(`${API_BASE_URL}/task/${taskId}/statut`, {
       method: "PATCH",
@@ -682,7 +688,7 @@ async function changeStatus(event, taskContainer) {
       },
       body: JSON.stringify({
         statut: newStatusId,
-        utilisateurId: 1,
+        utilisateurId: currentUser.id, // Utilisation de l'ID de l'utilisateur connecté
       }),
     });
 
@@ -700,10 +706,10 @@ async function changeStatus(event, taskContainer) {
         targetColumn = document.getElementById("todo");
         break;
       case "in-progress":
-        targetColumn = document.getElementById("in-progress");
+        targetColumn = document.getElementById("inProgress");
         break;
       case "in-review":
-        targetColumn = document.getElementById("in-review");
+        targetColumn = document.getElementById("inReview");
         break;
       case "done":
         targetColumn = document.getElementById("done");
@@ -713,7 +719,9 @@ async function changeStatus(event, taskContainer) {
     }
 
     // Déplacer la tâche
-    targetColumn.appendChild(taskDiv);
+    if (targetColumn) {
+      targetColumn.appendChild(taskDiv);
+    }
 
     // Mettre à jour le select pour refléter le nouveau statut
     const statusSelect = taskDiv.querySelector("#taskStatus");
