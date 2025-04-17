@@ -197,7 +197,7 @@ function openTaskDetailsModal(task) {
   }
 
   // Charger l'historique de la tâche
-  fetch(`https://localhost:5000/api/task/${taskId}/history`)
+  fetch(`/api/task/${taskId}/history`)
     .then((response) => response.json())
     .then((data) => {
       const historyList = document.getElementById("taskHistoryList");
@@ -392,7 +392,7 @@ async function addTask() {
 
     console.log("Données envoyées au serveur:", taskData);
 
-    const response = await fetch(`${API_BASE_URL}/task`, {
+    const response = await fetch(`/task`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -458,7 +458,7 @@ async function deleteTask(task) {
 
   try {
     // Envoyer la requête DELETE au serveur
-    const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
+    const response = await fetch(`/task/${taskId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -577,7 +577,7 @@ async function saveEditedTask() {
 
     console.log("Données envoyées au serveur:", taskData);
 
-    const response = await fetch(`${API_BASE_URL}/task/${taskId}`, {
+    const response = await fetch(`/task/${taskId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -689,7 +689,7 @@ async function changeStatus(event, taskContainer) {
     }
 
     // Mettre à jour le statut dans la base de données
-    const response = await fetch(`${API_BASE_URL}/task/${taskId}/statut`, {
+    const response = await fetch(`/api/task/${taskId}/statut`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
