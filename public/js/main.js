@@ -392,7 +392,7 @@ async function addTask() {
 
     console.log("Données envoyées au serveur:", taskData);
 
-    const response = await fetch(`/task`, {
+    const response = await fetch(`/api/task`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -458,7 +458,7 @@ async function deleteTask(task) {
 
   try {
     // Envoyer la requête DELETE au serveur
-    const response = await fetch(`/task/${taskId}`, {
+    const response = await fetch(`/api/task/${taskId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -577,7 +577,7 @@ async function saveEditedTask() {
 
     console.log("Données envoyées au serveur:", taskData);
 
-    const response = await fetch(`/task/${taskId}`, {
+    const response = await fetch(`/api/task/${taskId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
