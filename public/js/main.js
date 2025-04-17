@@ -683,7 +683,9 @@ async function changeStatus(event, taskContainer) {
     // Récupérer l'utilisateur connecté
     const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
     if (!currentUser?.id) {
-      throw new Error("Vous devez être connecté pour modifier le statut d'une tâche");
+      throw new Error(
+        "Vous devez être connecté pour modifier le statut d'une tâche"
+      );
     }
 
     // Mettre à jour le statut dans la base de données
@@ -725,9 +727,8 @@ async function changeStatus(event, taskContainer) {
     }
 
     // Déplacer la tâche
-    
-      targetColumn.appendChild(taskDiv);
-    
+
+    targetColumn.appendChild(taskDiv);
 
     // Mettre à jour le select pour refléter le nouveau statut
     const statusSelect = taskDiv.querySelector("#taskStatus");
@@ -754,7 +755,7 @@ async function changeStatus(event, taskContainer) {
 // Charger les tâches existantes
 async function loadExistingTasks() {
   try {
-    const response = await fetch(`${API_BASE_URL}/tasks`);
+    const response = await fetch("/api/tasks");
     if (!response.ok) {
       throw new Error("Erreur lors du chargement des tâches");
     }
